@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: hub-service
+    name: ai-service
 
   data:
     redis:
