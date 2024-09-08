@@ -1,9 +1,9 @@
 server:
-  port: 19097
+  port: 19096
 
 spring:
   application:
-    name: ai-service
+    name: hub-service
 
   data:
     redis:
@@ -14,7 +14,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/ai
+    url: jdbc:postgresql://localhost:5432/hub
     username: delivery
     password: delivery777
 
