@@ -39,5 +39,4 @@ public class Company extends AuditEntity{
     @OneToMany(mappedBy = "company")
     private List<Product> products = new ArrayList<>();
 
-
 }
