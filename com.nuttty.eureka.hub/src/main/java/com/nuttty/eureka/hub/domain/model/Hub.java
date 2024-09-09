@@ -1,5 +1,6 @@
 package com.nuttty.eureka.hub.domain.model;
 
+import com.nuttty.eureka.hub.presestation.request.HubRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,10 +21,10 @@ public class Hub extends AuditEntity{
     @Column(name = "hub_id")
     private UUID id;
 
-    @Column(unique = true)
+//    @Column(unique = true)
     private String name;
 
-    @Column(unique = true)
+//    @Column(unique = true)
     private String address;
     private String latitude;
     private String longitude;
@@ -37,5 +38,19 @@ public class Hub extends AuditEntity{
         this.latitude = latitude;
         this.longitude = longitude;
         this.userId = userId;
+    }
+
+    /**
+     * 허브 수정 메서드
+     * @param request
+     * @return
+     */
+    public Hub update(HubRequest request) {
+        this.name = request.getName();
+        this.address = request.getAddress();
+        this.latitude = request.getLatitude();
+        this.longitude = request.getLongitude();
+        this.userId = request.getUser_id();
+        return this;
     }
 }
