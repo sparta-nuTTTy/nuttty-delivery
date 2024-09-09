@@ -25,13 +25,14 @@ public class Hub extends AuditEntity{
     private String latitude;
     private String longitude;
 
-    private Long user_id;
+    @Column(name = "user_id")
+    private Long userId;
 
-    public Hub(String name, String address, String latitude, String longitude, Long user_id) {
+    public Hub(String name, String address, String latitude, String longitude, Long userId) {
         this.name = name;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
-        this.user_id = user_id;
+        this.userId = userId;
     }
 }
