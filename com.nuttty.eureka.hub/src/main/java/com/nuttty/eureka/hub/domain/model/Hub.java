@@ -20,7 +20,10 @@ public class Hub extends AuditEntity{
     @Column(name = "hub_id")
     private UUID id;
 
+    @Column(unique = true)
     private String name;
+
+    @Column(unique = true)
     private String address;
     private String latitude;
     private String longitude;
