@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  zipkin:
+    image: openzipkin/zipkin
+    container_name: zipkin
+    restart: always
+    ports:
+      - 9411:9411
+
+  redis-stack:
+    image: redis/redis-stack
+    container_name: redis-stack-compose
+    restart: always
+    command: ["redis-server", "--requirepass", "systempass"]
+    ports:
+      - 6379:6379
+      - 8001:8001 # 레디스 인사이트 접속 포트
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_USER: 'delivery'
+      POSTGRES_PASSWORD: 'delivery777'
