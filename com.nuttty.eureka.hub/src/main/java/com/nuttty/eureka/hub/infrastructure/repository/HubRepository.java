@@ -1,6 +1,7 @@
 package com.nuttty.eureka.hub.infrastructure.repository;
 
 import com.nuttty.eureka.hub.domain.model.Hub;
+import com.nuttty.eureka.hub.domain.repository.HubRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -8,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface HubRepository extends JpaRepository<Hub, UUID> {
+public interface HubRepository extends JpaRepository<Hub, UUID>, HubRepositoryCustom {
 
     @Query("select count(h) > 0 from Hub h where (h.address = :address or h.name = :name) and h.isDelete = false")
     boolean existsByAddressOrName(@Param("address") String address, @Param("name") String name);
