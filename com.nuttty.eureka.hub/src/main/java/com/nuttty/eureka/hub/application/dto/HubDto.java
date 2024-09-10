@@ -1,7 +1,7 @@
 package com.nuttty.eureka.hub.application.dto;
 
 import com.nuttty.eureka.hub.domain.model.Hub;
-import lombok.AllArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +10,6 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class HubDto {
 
     private UUID hub_id;
@@ -25,6 +24,19 @@ public class HubDto {
     private LocalDateTime updated_at;
     private String updated_by;
 
+    @QueryProjection
+    public HubDto(UUID hub_id, Long user_id, String name, String address, String latitude, String longitude, LocalDateTime created_at, String created_by, LocalDateTime updated_at, String updated_by) {
+        this.hub_id = hub_id;
+        this.user_id = user_id;
+        this.name = name;
+        this.address = address;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.created_at = created_at;
+        this.created_by = created_by;
+        this.updated_at = updated_at;
+        this.updated_by = updated_by;
+    }
 
     public static HubDto toDto(Hub hub) {
         return new HubDto(hub.getId(),

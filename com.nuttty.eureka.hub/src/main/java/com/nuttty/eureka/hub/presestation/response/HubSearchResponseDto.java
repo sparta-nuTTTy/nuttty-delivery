@@ -5,12 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HubResponse {
+public class HubSearchResponseDto {
 
     private int status_code;
     private String result_message;
-    private HubDto hubDto;
+    private List<HubDto> hubDto;
 }

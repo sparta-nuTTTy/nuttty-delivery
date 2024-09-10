@@ -1,12 +1,17 @@
 package com.nuttty.eureka.hub.presestation.controller;
 
 import com.nuttty.eureka.hub.application.service.HubService;
-import com.nuttty.eureka.hub.presestation.request.HubRequest;
-import com.nuttty.eureka.hub.presestation.response.HubDelResponse;
-import com.nuttty.eureka.hub.presestation.response.HubResponse;
+import com.nuttty.eureka.hub.presestation.request.HubRequestDto;
+import com.nuttty.eureka.hub.presestation.request.HubSearchRequestDto;
+import com.nuttty.eureka.hub.presestation.response.HubDelResponseDto;
+import com.nuttty.eureka.hub.presestation.response.HubResponseDto;
+import com.nuttty.eureka.hub.presestation.response.HubSearchResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,13 +36,13 @@ public class HubController {
      */
     // TODO required = true 변경, validateRoleMaster 주석 해제, 헤더 키 값 확인
     @PostMapping("/hubs")
-    public ResponseEntity<?> createHub(@Valid @RequestBody HubRequest request,
+    public ResponseEntity<?> createHub(@Valid @RequestBody HubRequestDto request,
                                        @RequestHeader(value = "X-User-Id", required = false) Long userId,
                                        @RequestHeader(value = "X-Role", required = false) String role) {
 //        validateRoleMaster(role);
         log.info("허브 생성 시도 중 | request: {}, loginUser: {}", request, userId);
 
-        HubResponse response = hubService.createHub(request);
+        HubResponseDto response = hubService.createHub(request);
 
         log.info("허브 생성 성공 | response: {}", response);
         return ResponseEntity.ok(response);
@@ -53,14 +58,14 @@ public class HubController {
      */
     @PatchMapping("/hubs/{hub_id}")
     // TODO required = true 변경, validateRoleMaster 주석 해제, 헤더 키 값 확인
-    public ResponseEntity<?> updateHub(@Valid @RequestBody HubRequest request,
+    public ResponseEntity<?> updateHub(@Valid @RequestBody HubRequestDto request,
                                        @PathVariable("hub_id") UUID hubId,
                                        @RequestHeader(value = "X-User-Id", required = false) Long userId,
                                        @RequestHeader(value = "X-Role", required = false) String role) {
 //        validateRoleMaster(role);
         log.info("허브 수정 시도 중 | request: {}, loginUser: {}, hubId: {}", request, userId, hubId);
 
-        HubResponse response = hubService.updateHub(request, hubId);
+        HubResponseDto response = hubService.updateHub(request, hubId);
 
         log.info("허브 수정 성공 | response: {}", response);
         return ResponseEntity.ok(response);
@@ -84,7 +89,39 @@ public class HubController {
         hubService.deleteHub(hubId, email);
 
         log.info("허브 삭제 완료 | hubId: {}, role: {}, email: {}", hubId, role, email);
-        return ResponseEntity.ok(new HubDelResponse(HttpStatus.OK.value(), "hub deleted", hubId + " 삭제 완료"));
+        return ResponseEntity.ok(new HubDelResponseDto(HttpStatus.OK.value(), "hub deleted", hubId + " 삭제 완료"));
+    }
+
+    /**
+     * 허브 단건 조회 | 모두 허용
+     * @param hubId
+     * @return
+     */
+    @GetMapping("/hubs/{hub_id}")
+    public ResponseEntity<?> findOneHub(@PathVariable("hub_id") UUID hubId) {
+        log.info("허브 단건 조회 시도 중 | hubId: {}", hubId);
+
+        HubResponseDto response = hubService.findOneHub(hubId);
+
+        log.info("허브 단건 조회 완료 | response: {}", response);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 허브 페이징 조회 | 모두 허용
+     * @param condition
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/hubs")
+    public ResponseEntity<?> findAllHub(HubSearchRequestDto condition,
+                                        @PageableDefault(size = 10) Pageable pageable) {
+        log.info("허브 전체 조회 시도 중 | condition: {}, pageble: {}", condition, pageable);
+
+        Page<HubSearchResponseDto> findAllHub = hubService.findAllHub(pageable, condition);
+
+        log.info("허브 전체 조회 완료 | condition: {}, pageble: {}", condition, pageable);
+        return ResponseEntity.ok(findAllHub);
     }
 
     /**
@@ -93,7 +130,7 @@ public class HubController {
      * @return
      */
     public boolean validateRoleMaster(String role) {
-        if (role.equals("ROLE_MASTER")) {
+        if (role.equals("MASTER")) {
             return true;
         } else {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "마스터만 접근 가능합니다.");
