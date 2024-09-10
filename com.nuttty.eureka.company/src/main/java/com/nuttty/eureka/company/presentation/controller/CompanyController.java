@@ -34,7 +34,7 @@ public class CompanyController {
      */
     @PostMapping("/companies")
     public ResponseEntity<?> createCompany(@RequestBody CompanyRequestDto request,
-                                           @RequestHeader(value = "X-Role") String role,
+                                           @RequestHeader(value = "X-User-Role") String role,
                                            @RequestHeader(value = "X-User-Id") Long userId) {
         validateExcludeRoleDeliveryPerson(role);
         log.info("업체 생산 시도 중 | request: {}, userId: {} | role: {}", request, userId, role);
@@ -55,7 +55,7 @@ public class CompanyController {
     @PatchMapping("/companies/{company_id}")
     public ResponseEntity<?> updateCompany(@PathVariable("company_id") UUID companyId,
                                            @RequestBody CompanyRequestDto request,
-                                           @RequestHeader(value = "X-Role") String role,
+                                           @RequestHeader(value = "X-User-Role") String role,
                                            @RequestHeader(value = "X-User-Id") Long userId) {
         validateExcludeRoleDeliveryPerson(role);
         log.info("업체 수정 시도 중 | request: {}, userId: {} | company_id: {}", request, userId, companyId);
@@ -74,8 +74,8 @@ public class CompanyController {
      */
     @DeleteMapping("/companies/{company_id}")
     public ResponseEntity<?> deleteCompany(@PathVariable("company_id") UUID companyId,
-                                           @RequestHeader(value = "X-Role") String role,
-                                           @RequestHeader(value = "X-Email") String email) {
+                                           @RequestHeader(value = "X-User-Role") String role,
+                                           @RequestHeader(value = "X-User-Email") String email) {
         validateRoleMaster(role);
         log.info("업체 삭제 시도 중 | company_id: {}, email: {}", companyId, email);
 

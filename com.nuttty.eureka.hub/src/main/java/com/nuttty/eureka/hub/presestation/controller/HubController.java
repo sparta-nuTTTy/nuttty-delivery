@@ -37,7 +37,7 @@ public class HubController {
     @PostMapping("/hubs")
     public ResponseEntity<?> createHub(@Valid @RequestBody HubRequestDto request,
                                        @RequestHeader(value = "X-User-Id") Long userId,
-                                       @RequestHeader(value = "X-Role") String role) {
+                                       @RequestHeader(value = "X-User-Role") String role) {
         validateRoleMaster(role);
         log.info("허브 생성 시도 중 | request: {}, loginUser: {}", request, userId);
 
@@ -59,7 +59,7 @@ public class HubController {
     public ResponseEntity<?> updateHub(@Valid @RequestBody HubRequestDto request,
                                        @PathVariable("hub_id") UUID hubId,
                                        @RequestHeader(value = "X-User-Id") Long userId,
-                                       @RequestHeader(value = "X-Role") String role) {
+                                       @RequestHeader(value = "X-User-Role") String role) {
         validateRoleMaster(role);
         log.info("허브 수정 시도 중 | request: {}, loginUser: {}, hubId: {}", request, userId, hubId);
 
@@ -78,8 +78,8 @@ public class HubController {
      */
     @DeleteMapping("/hubs/{hub_id}")
     public ResponseEntity<?> deleteHub(@PathVariable("hub_id") UUID hubId,
-                                       @RequestHeader(value = "X-Role") String role,
-                                       @RequestHeader(value = "X-Email") String email) {
+                                       @RequestHeader(value = "X-User-Role") String role,
+                                       @RequestHeader(value = "X-User-Email") String email) {
         validateRoleMaster(role);
         log.info("허브 삭제 시도 중 | hubId: {}, role: {}, email: {}", hubId, role, email);
 
