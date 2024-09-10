@@ -1,6 +1,7 @@
 package com.nuttty.eureka.hub.exception;
 
 import com.nuttty.eureka.hub.application.dto.ErrorResponse;
+import com.nuttty.eureka.hub.exception.exceptionsdefined.DelegationException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -80,4 +81,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    /**
+     * 대리 등록 권한 오류
+     * @param ex
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(DelegationException.class)
+    public ResponseEntity<ErrorResponse> handlerForbidden(DelegationException ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                "Forbidden Error",
+                ex.getMessage(),
+                request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
 }
