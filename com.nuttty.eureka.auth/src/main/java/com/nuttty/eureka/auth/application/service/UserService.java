@@ -25,6 +25,6 @@ public class UserService {
             throw new IllegalArgumentException("해당 유저의 정보를 조회 할 권한이 없습니다.");
         }
 
-        return new UserInfoDto(user);
+        return UserInfoDto.of(user);
     }
 }
