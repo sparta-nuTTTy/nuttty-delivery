@@ -201,6 +201,7 @@ public class CompanyService {
      * @param email
      * @return
      */
+    @Transactional
     public CompanyDelResponseDto deleteCompany(UUID companyId, String email) {
         Company findCompany = companyRepository.findById(companyId).orElseThrow(() ->
                 new EntityNotFoundException("not found company"));

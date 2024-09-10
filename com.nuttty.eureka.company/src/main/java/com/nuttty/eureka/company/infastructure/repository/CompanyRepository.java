@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface CompanyRepository extends JpaRepository<Company, UUID>, CompanyRepositoryCustom {
@@ -21,4 +22,10 @@ public interface CompanyRepository extends JpaRepository<Company, UUID>, Company
 
     @Query("select count(c) > 0 from Company c where c.address = :address and c.id <> :companyId")
     boolean existsByAddressAndExcludeId(@Param("address") String address, @Param("companyId") UUID companyId);
+
+    @Query("select c from Company c where c.id = :id and c.hubId = :hubId")
+    Optional<Company> findByCompanyIdAndHubId(@Param("id") UUID companyId, @Param("hubId") UUID hubId);
+
+    @Query("select c from Company c where c.userId = :userId")
+    Optional<Company> findByUserId(@Param("userId") Long userId);
 }
