@@ -115,7 +115,7 @@ public class HubController {
      */
     @GetMapping("/hubs")
     public ResponseEntity<?> findAllHub(HubSearchRequestDto condition,
-                                        @PageableDefault(size = 10) Pageable pageable) {
+                                        @PageableDefault(size = 20) Pageable pageable) {
         log.info("허브 전체 조회 시도 중 | condition: {}, pageble: {}", condition, pageable);
 
         Page<HubSearchResponseDto> findAllHub = hubService.findAllHub(pageable, condition);
