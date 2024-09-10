@@ -53,8 +53,10 @@ public class HubRepositoryImpl implements HubRepositoryCustom {
                         addressContains(condition.getAddress()),
                         hub.isDelete.eq(false));
 
-        Sort sort = pageable.getSort();
-        if (sort.isSorted()) {
+        if (pageable.getSort().isEmpty()) {
+            query.orderBy(hub.createdAt.asc());
+        }else {
+            Sort sort = pageable.getSort();
             sort.forEach(order -> {
                 String property = order.getProperty();
                 Sort.Direction direction = order.getDirection();
