@@ -11,6 +11,9 @@ import com.nuttty.eureka.hub.presestation.response.HubSearchResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +39,8 @@ public class HubService {
      */
     // TODO findUserById 주석 해제, UserClinet 확인, 허브 관리지인지 확인
     @Transactional
+    @CachePut(cacheNames = "hubCache", key = "#result.hubDto.hub_id")
+    @CacheEvict(cacheNames = "hubSearchCache", allEntries = true)
     public HubResponseDto createHub(HubRequestDto request) {
 
         // 다른 허브에 등록된 허브 관리자인지 확인
@@ -67,6 +72,8 @@ public class HubService {
      */
     // TODO findUserById 주석 해제, UserClinet 확인, 허브 관리지인지 확인
     @Transactional
+    @CachePut(cacheNames = "hubCache", key = "#hubId")
+    @CacheEvict(cacheNames = "hubSearchCache", allEntries = true)
     public HubResponseDto updateHub(HubRequestDto request, UUID hubId) {
 
         // 수정 대상 제외 허브 이름, 주소 중복 확인
@@ -116,6 +123,7 @@ public class HubService {
      * @param hubId
      * @return
      */
+    @Cacheable(cacheNames = "hubCache", key = "#hubId")
     public HubResponseDto findOneHub(UUID hubId) {
 
         Hub findHub = hubRepository.findById(hubId).orElseThrow(() ->
@@ -130,6 +138,7 @@ public class HubService {
      * @param condition
      * @return
      */
+    @Cacheable(cacheNames = "hubSearchCache", key = "{#pageable.pageNumber, #pageable.pageSize}")
     public Page<HubSearchResponseDto> findAllHub(Pageable pageable, HubSearchRequestDto condition) {
 
         return hubRepository.findAllHub(pageable, condition);

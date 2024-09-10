@@ -5,12 +5,13 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
-public class HubDto {
+public class HubDto implements Serializable {
 
     private UUID hub_id;
     private Long user_id;
