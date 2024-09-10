@@ -17,14 +17,17 @@ public class UserService {
     // 회원 상세 조회
     @Transactional(readOnly = true)
     public UserInfoDto getUserInfo(Long loggedUserId, Long targetUserId) {
-        // 유저 등록 여부 검사
-        User user = userRepository.findById(targetUserId)
+        // 조회 유저 가입 여부 검사
+        User targetUser = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 유저입니다."));
-        // 로그인한 유저의 정보와 조회하려는 유저의 정보 일치 검사 & 권한체크
-        if(!loggedUserId.equals(targetUserId) && !user.getRole().equals(UserRoleEnum.MASTER)) {
+        // 로그인 유저 가입 여부 검사
+        User loggedUser = userRepository.findById(loggedUserId)
+                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 유저입니다."));
+        // 로그인 유저의 정보와 조회 할 유저의 정보 일치 검사 & 로그인 유저 권한 체크
+        if(!loggedUserId.equals(targetUserId) && !loggedUser.getRole().equals(UserRoleEnum.MASTER)) {
             throw new IllegalArgumentException("해당 유저의 정보를 조회 할 권한이 없습니다.");
         }
 
-        return UserInfoDto.of(user);
+        return UserInfoDto.of(targetUser);
     }
 }
