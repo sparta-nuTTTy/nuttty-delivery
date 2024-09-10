@@ -12,7 +12,7 @@ spring:
         - id: auth-service  # ??? ???
           uri: lb://auth-service # 'auth-service'?? ???? ?? ???? ???? ???
           predicates:
-          - Path=/api/v1/auth/**, /api/v1/users/** # /api/v1/auth/** ??? ???? ??? ? ???? ??
+          - Path=/api/v1/auth/**, /api/v1/users/**, /api/v1/delivery-people/** # /api/v1/auth/** ??? ???? ??? ? ???? ??
         - id: hub-service
           uri: lb://hub-service
           predicates:
@@ -35,6 +35,6 @@ eureka:
       defaultZone: http://localhost:19090/eureka/
 
 jwt:
-  access-expiration: 360000
+  access-expiration: 3600000
   secret-key: "7Iqk7YyM66W07YOA7L2U65Sp7YG065-9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg=="
   admin-token: AIzaSyBZFANrsha1UH5CaSDUxtfdXaTQ5yOtPhE
