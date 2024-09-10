@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HubRequest {
+public class HubRequestDto {
 
     @NotNull(message = "User ID must be provided")
     private Long user_id;

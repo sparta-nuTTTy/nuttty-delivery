@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HubDelResponse {
+public class HubDelResponseDto {
 
     private int status_code;
     private String result_message;

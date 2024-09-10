@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HubResponse {
+public class HubResponseDto {
 
     private int status_code;
     private String result_message;

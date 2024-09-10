@@ -1,6 +1,6 @@
 package com.nuttty.eureka.hub.domain.model;
 
-import com.nuttty.eureka.hub.presestation.request.HubRequest;
+import com.nuttty.eureka.hub.presestation.request.HubRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,7 +45,7 @@ public class Hub extends AuditEntity{
      * @param request
      * @return
      */
-    public Hub update(HubRequest request) {
+    public Hub update(HubRequestDto request) {
         this.name = request.getName();
         this.address = request.getAddress();
         this.latitude = request.getLatitude();
