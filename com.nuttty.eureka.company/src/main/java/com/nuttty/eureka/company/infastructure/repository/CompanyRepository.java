@@ -1,13 +1,14 @@
 package com.nuttty.eureka.company.infastructure.repository;
 
 import com.nuttty.eureka.company.domain.model.Company;
+import com.nuttty.eureka.company.domain.repository.CompanyRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
-public interface CompanyRepository extends JpaRepository<Company, UUID> {
+public interface CompanyRepository extends JpaRepository<Company, UUID>, CompanyRepositoryCustom {
 
     @Query("select count(c) > 0 from Company c where c.address = :address")
     boolean existsByAddress(@Param("address") String address);

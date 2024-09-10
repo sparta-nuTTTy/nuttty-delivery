@@ -2,10 +2,14 @@ package com.nuttty.eureka.company.presentation.controller;
 
 import com.nuttty.eureka.company.application.service.CompanyService;
 import com.nuttty.eureka.company.presentation.request.CompanyRequestDto;
+import com.nuttty.eureka.company.presentation.request.CompanySearchRequestDto;
 import com.nuttty.eureka.company.presentation.response.CompanyDelResponseDto;
 import com.nuttty.eureka.company.presentation.response.CompanyResponseDto;
+import com.nuttty.eureka.company.presentation.response.CompanySearchResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +81,35 @@ public class CompanyController {
 
         CompanyDelResponseDto response = companyService.deleteCompany(companyId, email);
         log.info("업체 삭제 완료 | response: {}", response);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 업체 개별 조회 | 모두 허용
+     * @param companyId
+     * @return
+     */
+    @GetMapping("/companies/{company_id}")
+    public ResponseEntity<?> findOneCompany(@PathVariable("company_id") UUID companyId) {
+        log.info("업체 개별 조회 시도 중 | company_id: {}", companyId);
+
+        CompanyResponseDto response = companyService.findOneCompany(companyId);
+        log.info("업체 개별 조회 완료 | response: {}", response);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 업체 페이지 조회 | 모두 허용
+     * @param pageable
+     * @param condition
+     * @return
+     */
+    @GetMapping("/companies")
+    public ResponseEntity<?> findAllCompany(Pageable pageable, CompanySearchRequestDto condition) {
+        log.info("업체 페이지 조회 시도 중 | condition: {}, pageble: {}", condition, pageable);
+
+        Page<CompanySearchResponseDto> response = companyService.findAllCompany(pageable, condition);
+        log.info("업체 페이지 조회 완료");
         return ResponseEntity.ok(response);
     }
 

@@ -9,13 +9,17 @@ import com.nuttty.eureka.company.domain.model.Company;
 import com.nuttty.eureka.company.exception.exceptionsdefined.DelegationException;
 import com.nuttty.eureka.company.infastructure.repository.CompanyRepository;
 import com.nuttty.eureka.company.presentation.request.CompanyRequestDto;
+import com.nuttty.eureka.company.presentation.request.CompanySearchRequestDto;
 import com.nuttty.eureka.company.presentation.response.CompanyDelResponseDto;
 import com.nuttty.eureka.company.presentation.response.CompanyResponseDto;
+import com.nuttty.eureka.company.presentation.response.CompanySearchResponseDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.ws.rs.NotAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -203,5 +207,29 @@ public class CompanyService {
 
         findCompany.delete(email);
         return new CompanyDelResponseDto(HttpStatus.OK.value(), "company deleted", companyId + " deleted");
+    }
+
+    /**
+     * 업체 개별 조회 | 모두 허용
+     * @param companyId
+     * @return
+     */
+    public CompanyResponseDto findOneCompany(UUID companyId) {
+
+        Company findCompany = companyRepository.findById(companyId).orElseThrow(() ->
+                new EntityNotFoundException("not found company"));
+
+        return new CompanyResponseDto(HttpStatus.OK.value(), "company found", CompanyDto.toDto(findCompany));
+    }
+
+    /**
+     * 업체 페이지 조회 | 모두 허용
+     * @param pageable
+     * @param condition
+     * @return
+     */
+    public Page<CompanySearchResponseDto> findAllCompany(Pageable pageable, CompanySearchRequestDto condition) {
+
+        return companyRepository.findAllCompany(pageable, condition);
     }
 }
