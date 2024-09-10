@@ -2,6 +2,7 @@ package com.nuttty.eureka.company.exception;
 
 import com.nuttty.eureka.company.application.dto.ErrorResponse;
 import com.nuttty.eureka.company.exception.exceptionsdefined.DelegationException;
+import com.nuttty.eureka.company.exception.exceptionsdefined.NotEnoughStockException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.NotAuthorizedException;
@@ -113,4 +114,38 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 request.getRequestURI());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
     }
+
+    /**
+     * 요청 형식이 틀렸을 경우 예외
+     * @param ex
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handlerBadRequest(IllegalArgumentException ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
+                ex.getMessage(),
+                request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    /**
+     * 재고 수량 부족 예외
+     * @param ex
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(NotEnoughStockException.class)
+    public ResponseEntity<ErrorResponse> handlerNotEnoughStock(NotEnoughStockException ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Not Enough Stock",
+                ex.getMessage(),
+                request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+
 }
