@@ -9,11 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-@Slf4j(topic = "Hub")
-public class LoggingAspectOfHub {
+@Slf4j(topic = "Product")
+public class LoggingAspectOfProduct {
 
-    // HubController, HubService 포인트 컷
-    @Pointcut("execution(* com.nuttty.eureka.company.presentation.controller.CompanyController..*(..)) || execution(* com.nuttty.eureka.company.application.service.CompanyService..*(..))")
+    // ProductController, ProductService 포인트 컷
+    @Pointcut("execution(* com.nuttty.eureka.company.presentation.controller.ProductController..*(..)) || execution(* com.nuttty.eureka.company.application.service.ProductService..*(..))")
     public void hubPackagePointcut() {
     }
 
