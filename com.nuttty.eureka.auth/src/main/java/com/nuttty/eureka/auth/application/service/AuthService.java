@@ -60,7 +60,7 @@ public class AuthService {
         User user = User.create(signupRequestDto.getUsername(), signupRequestDto.getEmail(), encodedPassword, userRole);
         userRepository.save(user);
 
-        return new UserInfoDto(user);
+        return UserInfoDto.of(user);
     }
 
     // 로그인
@@ -87,8 +87,9 @@ public class AuthService {
         return userRepository.findByEmail(user.getEmail())
                 // user_id & role 로 JWT 토큰을 생성
                 .map(userInfo -> TokenDto.of(Jwts.builder()
-                                .claim("X-User-Id", userInfo.getUserId())
-                                .claim("X-Role", userInfo.getRole())
+                                .claim("user_id", userInfo.getUserId())
+                                .claim("role", userInfo.getRole())
+                                .claim("email", userInfo.getEmail())
                                 .issuer(issuer)
                                 .issuedAt(new Date(System.currentTimeMillis()))
                                 .expiration(new Date(System.currentTimeMillis() + accessExpiration))
@@ -96,5 +97,10 @@ public class AuthService {
                                 .compact())
                         //유저가 존재하지 않는다면 Exception 을 발생 시킵니다.
                 ).orElseThrow(() -> new IllegalArgumentException("Reject createAccessToken: 존재하지 않는 유저입니다."));
+    }
+
+    // userId 존재여부 검증 API
+    public Boolean verifyUser(Long userId) {
+        return userRepository.findById(userId).isPresent();
     }
 }

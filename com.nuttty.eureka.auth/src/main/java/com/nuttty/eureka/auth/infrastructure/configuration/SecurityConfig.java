@@ -24,10 +24,10 @@ public class SecurityConfig {
         http
                 // CSRF 보호를 비활성화
                 .csrf(csrf -> csrf.disable())
-                // 요청에 대한 접근 권한 설정
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .anyRequest().authenticated())
+                // 요청에 대한 접근 권한 설정 >>> Gateway-Service Global Filter에서 권한 설정 (Spring Security Filter로 개선 예정)
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .requestMatchers("/api/v1/auth/**").permitAll()
+//                        .anyRequest().authenticated())
                 // 세션을 사용하지 않도록 STATELESS로 설정
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));

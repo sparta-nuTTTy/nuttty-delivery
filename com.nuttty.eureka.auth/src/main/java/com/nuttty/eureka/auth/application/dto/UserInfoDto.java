@@ -2,15 +2,14 @@ package com.nuttty.eureka.auth.application.dto;
 
 import com.nuttty.eureka.auth.domain.model.User;
 import com.nuttty.eureka.auth.domain.model.UserRoleEnum;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 public class UserInfoDto {
     private Long user_id;
     private String username;
@@ -23,15 +22,17 @@ public class UserInfoDto {
     private String updated_by;
 
 
-    public UserInfoDto(User user) {
-        this.user_id = user.getUserId();
-        this.username = user.getUsername();
-        this.email = user.getEmail();
-        this.role = user.getRole();
-        this.is_delete = user.getIsDelete();
-        this.created_at = user.getCreatedAt();
-        this.created_by = user.getCreatedBy();
-        this.updated_at = user.getUpdatedAt();
-        this.updated_by = user.getUpdatedBy();
+    public static UserInfoDto of(User user) {
+        return UserInfoDto.builder()
+                .user_id(user.getUserId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .is_delete(user.getIsDelete())
+                .created_at(user.getCreatedAt())
+                .created_by(user.getCreatedBy())
+                .updated_at(user.getUpdatedAt())
+                .updated_by(user.getUpdatedBy())
+                .build();
     }
 }
