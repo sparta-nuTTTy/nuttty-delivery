@@ -34,12 +34,11 @@ public class HubController {
      * @param role
      * @return
      */
-    // TODO required = true 변경, validateRoleMaster 주석 해제, 헤더 키 값 확인
     @PostMapping("/hubs")
     public ResponseEntity<?> createHub(@Valid @RequestBody HubRequestDto request,
-                                       @RequestHeader(value = "X-User-Id", required = false) Long userId,
-                                       @RequestHeader(value = "X-Role", required = false) String role) {
-//        validateRoleMaster(role);
+                                       @RequestHeader(value = "X-User-Id") Long userId,
+                                       @RequestHeader(value = "X-Role") String role) {
+        validateRoleMaster(role);
         log.info("허브 생성 시도 중 | request: {}, loginUser: {}", request, userId);
 
         HubResponseDto response = hubService.createHub(request);
@@ -57,12 +56,11 @@ public class HubController {
      * @return
      */
     @PatchMapping("/hubs/{hub_id}")
-    // TODO required = true 변경, validateRoleMaster 주석 해제, 헤더 키 값 확인
     public ResponseEntity<?> updateHub(@Valid @RequestBody HubRequestDto request,
                                        @PathVariable("hub_id") UUID hubId,
-                                       @RequestHeader(value = "X-User-Id", required = false) Long userId,
-                                       @RequestHeader(value = "X-Role", required = false) String role) {
-//        validateRoleMaster(role);
+                                       @RequestHeader(value = "X-User-Id") Long userId,
+                                       @RequestHeader(value = "X-Role") String role) {
+        validateRoleMaster(role);
         log.info("허브 수정 시도 중 | request: {}, loginUser: {}, hubId: {}", request, userId, hubId);
 
         HubResponseDto response = hubService.updateHub(request, hubId);
@@ -79,11 +77,10 @@ public class HubController {
      * @return
      */
     @DeleteMapping("/hubs/{hub_id}")
-    // TODO required = true 변경, validateRoleMaster 주석 해제, 헤더 키 값 확인
     public ResponseEntity<?> deleteHub(@PathVariable("hub_id") UUID hubId,
-                                       @RequestHeader(value = "X-Role", required = false) String role,
-                                       @RequestHeader(value = "X-Email", required = false) String email) {
-//        validateRoleMaster(role);
+                                       @RequestHeader(value = "X-Role") String role,
+                                       @RequestHeader(value = "X-Email") String email) {
+        validateRoleMaster(role);
         log.info("허브 삭제 시도 중 | hubId: {}, role: {}, email: {}", hubId, role, email);
 
         hubService.deleteHub(hubId, email);
