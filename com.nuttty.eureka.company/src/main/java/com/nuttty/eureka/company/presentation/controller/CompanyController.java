@@ -6,6 +6,7 @@ import com.nuttty.eureka.company.presentation.request.CompanySearchRequestDto;
 import com.nuttty.eureka.company.presentation.response.CompanyDelResponseDto;
 import com.nuttty.eureka.company.presentation.response.CompanyResponseDto;
 import com.nuttty.eureka.company.presentation.response.CompanySearchResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,7 +34,7 @@ public class CompanyController {
      * @return
      */
     @PostMapping("/companies")
-    public ResponseEntity<?> createCompany(@RequestBody CompanyRequestDto request,
+    public ResponseEntity<?> createCompany(@Valid @RequestBody CompanyRequestDto request,
                                            @RequestHeader(value = "X-User-Role") String role,
                                            @RequestHeader(value = "X-User-Id") Long userId) {
         validateExcludeRoleDeliveryPerson(role);
@@ -54,7 +55,7 @@ public class CompanyController {
      */
     @PatchMapping("/companies/{company_id}")
     public ResponseEntity<?> updateCompany(@PathVariable("company_id") UUID companyId,
-                                           @RequestBody CompanyRequestDto request,
+                                           @Valid @RequestBody CompanyRequestDto request,
                                            @RequestHeader(value = "X-User-Role") String role,
                                            @RequestHeader(value = "X-User-Id") Long userId) {
         validateExcludeRoleDeliveryPerson(role);
