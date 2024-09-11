@@ -14,7 +14,7 @@ public class AuditorAwareImpl implements AuditorAware<String> {
 
     @Override
     public Optional<String> getCurrentAuditor() {
-        String byWho = httpServletRequest.getHeader("X-User-Id");
+        String byWho = httpServletRequest.getHeader("X-User-Email");
         if (!StringUtils.hasText(byWho)) {
             byWho = "system";
         }

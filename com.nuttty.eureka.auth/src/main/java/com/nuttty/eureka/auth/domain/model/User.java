@@ -41,4 +41,8 @@ public class User extends AuditEntity {
                 .role(role)
                 .build();
     }
+
+
+    // 회원 role 수정
+    public void updateUserRole(UserRoleEnum role) {this.role = role;}
 }
