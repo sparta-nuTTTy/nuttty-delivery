@@ -9,7 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthRequestDto {
 
-    private int status_code;
-    private String result_message;
-    private AuthDto authDto;
+    // API 응답 결과
+    private AuthDto data;
+
+    // API 응답 코드
+    private int resultCode;
+
+    // API 응답 메시지
+    private String resultMessage;
 }
