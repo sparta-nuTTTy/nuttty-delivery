@@ -23,9 +23,10 @@ public class Order extends AuditEntity {
     private UUID orderId;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderProduct> orderProductList = new ArrayList<>();
+    private List<OrderProduct> orderProducts = new ArrayList<>();
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "delivery_id", nullable = false)
     private Delivery delivery;
 
     @Column(name = "receiver_id", nullable = false)
@@ -37,17 +38,21 @@ public class Order extends AuditEntity {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
-    public static Order cereate(UUID receiverId, UUID supplierId) {
+    public static Order createOrder(UUID receiverId, UUID supplierId) {
         return Order.builder()
                 .receiverId(receiverId)
                 .supplierId(supplierId)
-                .totalPrice(BigDecimal.ZERO)
                 .build();
     }
 
-    public void addOrderProduct(OrderProduct orderProduct) {
-        orderProductList.add(orderProduct);
-        totalPrice = totalPrice.add(orderProduct.getTotalPrice());
+    public void addOrderProducts(List<OrderProduct> orderProducts) {
+        this.orderProducts.addAll(orderProducts);
+        this.totalPrice = this.orderProducts.stream()
+                .map(OrderProduct::getTotalPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public void setDelivery(Delivery delivery) {
+        this.delivery = delivery;
     }
 }
-

@@ -30,20 +30,19 @@ public class OrderProduct extends AuditEntity {
     @Column(name = "product_price", nullable = false)
     private BigDecimal productPrice;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    @Column(name = "order_amount", nullable = false)
+    private int orderAmount;
 
     public BigDecimal getTotalPrice() {
-        return productPrice.multiply(BigDecimal.valueOf(quantity));
+        return productPrice.multiply(BigDecimal.valueOf(orderAmount));
     }
 
-    public static OrderProduct create(UUID productId, BigDecimal productPrice, Integer quantity) {
+    public static OrderProduct createOrderProduct(Order order, UUID productId, BigDecimal productPrice, int orderAmount) {
         return OrderProduct.builder()
+                .order(order)
                 .productId(productId)
                 .productPrice(productPrice)
-                .quantity(quantity)
+                .orderAmount(orderAmount)
                 .build();
     }
-
-
 }
