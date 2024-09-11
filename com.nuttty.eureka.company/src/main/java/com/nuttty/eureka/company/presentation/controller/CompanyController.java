@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -106,7 +107,7 @@ public class CompanyController {
      * @return
      */
     @GetMapping("/companies")
-    public ResponseEntity<?> findAllCompany(Pageable pageable, CompanySearchRequestDto condition) {
+    public ResponseEntity<?> findAllCompany(@PageableDefault(size = 10) Pageable pageable, CompanySearchRequestDto condition) {
         log.info("업체 페이지 조회 시도 중 | condition: {}, pageble: {}", condition, pageable);
 
         Page<CompanySearchResponseDto> response = companyService.findAllCompany(pageable, condition);

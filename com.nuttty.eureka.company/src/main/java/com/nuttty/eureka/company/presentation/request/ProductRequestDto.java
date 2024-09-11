@@ -18,11 +18,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ProductRequestDto {
 
-    @NotBlank(message = "Company ID must be provided")
     @NotNull(message = "Company ID must be provided")
     private UUID company_id;
 
-    @NotBlank(message = "Hub ID must be provided")
     @NotNull(message = "Hub ID must be provided")
     private UUID hub_id;
 
@@ -31,6 +29,7 @@ public class ProductRequestDto {
     private String product_name;
 
     @Digits(integer = 10, fraction = 2, message = "제품 가격은 총 10자리 숫자까지 입력 가능하며, 소수점 이하 2자리까지 허용됩니다.")
+    @NotNull(message = "Product Price must be provided")
     private BigDecimal product_price;
 
     @NotNull(message = "Product Quantity must be provided")
