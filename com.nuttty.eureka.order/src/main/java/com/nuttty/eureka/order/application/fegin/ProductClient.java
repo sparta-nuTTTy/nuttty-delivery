@@ -1,6 +1,6 @@
-package com.nuttty.eureka.order.infrastructure.fegin;
+package com.nuttty.eureka.order.application.fegin;
 
-import com.nuttty.eureka.order.infrastructure.fegin.dto.ProductInfoDto;
+import com.nuttty.eureka.order.application.fegin.dto.ProductInfoDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

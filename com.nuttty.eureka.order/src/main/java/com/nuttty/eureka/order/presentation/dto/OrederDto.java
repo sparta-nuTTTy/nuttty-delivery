@@ -1,4 +1,4 @@
-package com.nuttty.eureka.order.application.dto;
+package com.nuttty.eureka.order.presentation.dto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.List;
 import java.util.UUID;
 
-import static com.nuttty.eureka.order.application.dto.OrderProductDto.*;
+import static com.nuttty.eureka.order.presentation.dto.OrderProductDto.*;
 
 public interface OrederDto {
     @Getter

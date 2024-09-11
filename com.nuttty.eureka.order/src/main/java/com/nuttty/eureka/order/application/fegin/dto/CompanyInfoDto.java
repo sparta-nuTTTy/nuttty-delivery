@@ -1,4 +1,4 @@
-package com.nuttty.eureka.order.infrastructure.fegin.dto;
+package com.nuttty.eureka.order.application.fegin.dto;
 
 import lombok.AccessLevel;
 import lombok.Getter;

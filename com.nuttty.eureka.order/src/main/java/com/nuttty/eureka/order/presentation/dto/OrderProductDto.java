@@ -1,4 +1,4 @@
-package com.nuttty.eureka.order.application.dto;
+package com.nuttty.eureka.order.presentation.dto;
 
 import lombok.*;
 

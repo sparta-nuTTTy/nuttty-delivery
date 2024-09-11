@@ -1,12 +1,12 @@
 package com.nuttty.eureka.order.application.service;
 
-import com.nuttty.eureka.order.application.dto.ResultResponse;
+import com.nuttty.eureka.order.presentation.dto.ResultResponse;
 import com.nuttty.eureka.order.domain.model.Order;
 import com.nuttty.eureka.order.domain.service.OrderDomainService;
-import com.nuttty.eureka.order.infrastructure.fegin.CompanyClient;
-import com.nuttty.eureka.order.infrastructure.fegin.ProductClient;
-import com.nuttty.eureka.order.infrastructure.fegin.dto.CompanyInfoDto;
-import com.nuttty.eureka.order.infrastructure.fegin.dto.ProductInfoDto;
+import com.nuttty.eureka.order.application.fegin.CompanyClient;
+import com.nuttty.eureka.order.application.fegin.ProductClient;
+import com.nuttty.eureka.order.application.fegin.dto.CompanyInfoDto;
+import com.nuttty.eureka.order.application.fegin.dto.ProductInfoDto;
 import com.nuttty.eureka.order.util.SuccessCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Collectors;
 
-import static com.nuttty.eureka.order.application.dto.OrderProductDto.*;
-import static com.nuttty.eureka.order.application.dto.OrederDto.*;
+import static com.nuttty.eureka.order.presentation.dto.OrderProductDto.*;
+import static com.nuttty.eureka.order.presentation.dto.OrederDto.*;
 
 @Service
 @Slf4j
