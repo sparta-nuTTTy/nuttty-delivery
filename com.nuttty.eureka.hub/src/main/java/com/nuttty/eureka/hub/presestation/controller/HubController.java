@@ -6,6 +6,9 @@ import com.nuttty.eureka.hub.presestation.request.HubSearchRequestDto;
 import com.nuttty.eureka.hub.presestation.response.HubDelResponseDto;
 import com.nuttty.eureka.hub.presestation.response.HubResponseDto;
 import com.nuttty.eureka.hub.presestation.response.HubSearchResponseDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
+@Tag(name = "허브", description = "허브 등록, 조회, 수정, 삭제 API")
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -35,13 +39,15 @@ public class HubController {
      * @return
      */
     @PostMapping("/hubs")
+    @Operation(summary = "허브 생성", description = "허브 생성 합니다.")
+    @ApiResponse(responseCode = "201", description = "hub created")
     public ResponseEntity<?> createHub(@Valid @RequestBody HubRequestDto request,
                                        @RequestHeader(value = "X-User-Id") Long userId,
                                        @RequestHeader(value = "X-User-Role") String role) {
         validateRoleMaster(role);
         log.info("허브 생성 시도 중 | request: {}, loginUser: {}", request, userId);
 
-        HubResponseDto response = hubService.createHub(request);
+        HubResponseDto response = hubService.createHub(request, userId);
 
         log.info("허브 생성 성공 | response: {}", response);
         return ResponseEntity.ok(response);
@@ -63,7 +69,7 @@ public class HubController {
         validateRoleMaster(role);
         log.info("허브 수정 시도 중 | request: {}, loginUser: {}, hubId: {}", request, userId, hubId);
 
-        HubResponseDto response = hubService.updateHub(request, hubId);
+        HubResponseDto response = hubService.updateHub(request, hubId, userId);
 
         log.info("허브 수정 성공 | response: {}", response);
         return ResponseEntity.ok(response);
