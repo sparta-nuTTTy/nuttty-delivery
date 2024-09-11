@@ -112,12 +112,11 @@ public class Product extends AuditEntity{
      * @return
      */
     public Integer cancelStock(Integer quantity) {
-        int restStock = 0;
         if (quantity == null || quantity < 0) {
             throw new IllegalArgumentException("Quantity must be greater than 0 or quantity is null");
         }else {
-            restStock = productQuantity + quantity;
+            productQuantity = productQuantity + quantity;
         }
-        return restStock;
+        return productQuantity;
     }
 }

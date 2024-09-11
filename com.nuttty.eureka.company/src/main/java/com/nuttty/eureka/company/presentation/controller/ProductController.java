@@ -2,11 +2,17 @@ package com.nuttty.eureka.company.presentation.controller;
 
 import com.nuttty.eureka.company.application.service.ProductService;
 import com.nuttty.eureka.company.presentation.request.ProductRequestDto;
+import com.nuttty.eureka.company.presentation.request.ProductSearchRequestDto;
 import com.nuttty.eureka.company.presentation.request.ProductUpdateRequestDto;
 import com.nuttty.eureka.company.presentation.response.ProductDelResponseDto;
 import com.nuttty.eureka.company.presentation.response.ProductResponseDto;
+import com.nuttty.eureka.company.presentation.response.ProductSearchResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +36,14 @@ public class ProductController {
      * @return
      */
     @PostMapping("/products")
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequestDto request,
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequestDto request,
                                            @RequestHeader(value = "X-User-Role") String role,
                                            @RequestHeader(value = "X-User-Id") Long userId) {
         validateExcludeRoleDeliveryPerson(role);
         log.info("상품 등록 시도 중 | request: {}, userId: {}, role: {}", request, userId, role);
 
         ProductResponseDto response = productService.createProduct(request, userId, role);
+
         log.info("상품 등록 완료 | response: {}, userId: {}, role: {}", response, userId, role);
         return ResponseEntity.ok(response);
     }
@@ -51,7 +58,7 @@ public class ProductController {
      */
     @PatchMapping("/products/{product_id}")
     public ResponseEntity<?> updateProduct(@PathVariable("product_id") UUID productId,
-                                           @RequestBody ProductUpdateRequestDto request,
+                                           @Valid @RequestBody ProductUpdateRequestDto request,
                                            @RequestHeader(value = "X-User-Role") String role,
                                            @RequestHeader(value = "X-User-Id") Long userId) {
         validateExcludeRoleDeliveryPerson(role);
@@ -110,7 +117,7 @@ public class ProductController {
      */
     @PatchMapping("/products/remove_stock/{product_id}")
     public Integer removeStock(@PathVariable("product_id") UUID productId,
-                                         @RequestParam("quantity") Integer quantity) {
+                               @RequestParam("quantity") Integer quantity) {
         log.info("재고 수량 감소 시도 중 | productId: {}, quantity: {}", productId, quantity);
 
         Integer restStock = productService.removeStock(productId, quantity);
@@ -132,6 +139,39 @@ public class ProductController {
         Integer restStock = productService.cancelStock(productId, quantity);
         log.info("재고 수량 복원 완료 | resStock: {}", restStock);
         return restStock;
+    }
+
+    /**
+     * 상품 단건 조회 | 모두 허용
+     * @param productId
+     * @return
+     */
+    @GetMapping("/products/{product_id}")
+    public ProductResponseDto findOneProduct(@PathVariable("product_id") UUID productId) {
+
+        log.info("상품 단건 조회 시도 중 | productId: {}", productId);
+
+        ProductResponseDto response = productService.findOneProduct(productId);
+
+        log.info("상품 단건 조회 완료 | response: {}", response);
+        return response;
+    }
+
+    /**
+     * 상품 페이지 조회 | 모두 허용
+     * @param pageable
+     * @param condition
+     * @return
+     */
+    @GetMapping("/products")
+    public Page<ProductSearchResponseDto> findAll(@PageableDefault(size = 10) Pageable pageable,
+                                                  ProductSearchRequestDto condition) {
+        log.info("상품 페이지 조회 시도 중 | pageable: {}, condition: {}", pageable, condition);
+
+        Page<ProductSearchResponseDto> response = productService.findAllProduct(pageable, condition);
+
+        log.info("상품 페이지 조회 완료 | response: {}", response);
+        return response;
     }
 
     /**
