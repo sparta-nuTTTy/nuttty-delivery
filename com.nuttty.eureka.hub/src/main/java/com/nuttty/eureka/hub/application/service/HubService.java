@@ -1,6 +1,6 @@
 package com.nuttty.eureka.hub.application.service;
 
-import com.nuttty.eureka.hub.application.client.UserClient;
+import com.nuttty.eureka.hub.application.client.AuthClient;
 import com.nuttty.eureka.hub.application.dto.AuthRequestDto;
 import com.nuttty.eureka.hub.application.dto.HubDto;
 import com.nuttty.eureka.hub.domain.model.Hub;
@@ -32,7 +32,7 @@ import java.util.UUID;
 public class HubService {
 
     private final HubRepository hubRepository;
-    private final UserClient userClient;
+    private final AuthClient authClient;
 
     /**
      * 허브 생성 | 마스터 허용
@@ -47,7 +47,7 @@ public class HubService {
     public HubResponseDto createHub(HubRequestDto request, Long userId) {
 
         // userId 존재 유무 확인, 허브 관리지인지 확인 v
-        AuthRequestDto findAuth = userClient.findUserById(userId, request.getUser_id());
+        AuthRequestDto findAuth = authClient.findUserById(userId, request.getUser_id());
         if (findAuth.getData() == null) {
             log.error("not found user with id " + request.getUser_id());
             throw new EntityNotFoundException("not found user with id " + request.getUser_id());
@@ -94,7 +94,7 @@ public class HubService {
                 new EntityNotFoundException("Hub with id " + hubId + " not found"));
 
         // userId 존재 유무 확인, 허브 관리지인지 확인 v
-        AuthRequestDto findAuth = userClient.findUserById(userId, request.getUser_id());
+        AuthRequestDto findAuth = authClient.findUserById(userId, request.getUser_id());
         if (findAuth.getData() == null) {
             log.error("not found user with id " + request.getUser_id());
             throw new EntityNotFoundException("not found user with id " + request.getUser_id());
