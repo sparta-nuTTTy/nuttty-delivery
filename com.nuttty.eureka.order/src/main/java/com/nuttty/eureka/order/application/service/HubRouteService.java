@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j(topic = "HubRouteService")
@@ -57,4 +59,22 @@ public class HubRouteService {
 
     }
 
+    // 허브 간 경로 조회(전체 - 링크드 리스트)
+    @Transactional(readOnly = true)
+    public List<HubRoute> findAllHubRoutes(UUID starHubId, UUID endHubId) {
+        List<HubRoute> routes = new ArrayList<>();
+
+        UUID currentHubId = starHubId;
+
+        while (!currentHubId.equals(endHubId)) {
+            // 출발 허브부터 도착 허브까지 경로 조회
+            HubRoute route = hubRouteRepository.findByDepartureHubId(currentHubId);
+            routes.add(route);
+
+            // 다음 허브로 이동
+            currentHubId = route.getArrivalHubId();
+        }
+
+        return routes;
+    }
 }
