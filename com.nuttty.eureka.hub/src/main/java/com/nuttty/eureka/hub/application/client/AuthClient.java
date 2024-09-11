@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @FeignClient(name = "auth-service")
-public interface UserClient {
+public interface AuthClient {
 
     @GetMapping("/api/v1/users/{user_id}")
     AuthRequestDto findUserById(@RequestHeader("X-User-Id") Long loggedUserId,

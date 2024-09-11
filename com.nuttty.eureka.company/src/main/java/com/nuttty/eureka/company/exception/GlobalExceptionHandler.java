@@ -2,15 +2,16 @@ package com.nuttty.eureka.company.exception;
 
 import com.nuttty.eureka.company.application.dto.ErrorResponse;
 import com.nuttty.eureka.company.exception.exceptionsdefined.DelegationException;
+import com.nuttty.eureka.company.exception.exceptionsdefined.MissmatchException;
 import com.nuttty.eureka.company.exception.exceptionsdefined.NotEnoughStockException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.ws.rs.NotAuthorizedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -105,8 +106,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request
      * @return
      */
-    @ExceptionHandler(NotAuthorizedException.class)
-    public ResponseEntity<ErrorResponse> handlerForbidden(NotAuthorizedException ex, HttpServletRequest request){
+    @ExceptionHandler(MissmatchException.class)
+    public ResponseEntity<ErrorResponse> handlerForbidden(MissmatchException ex, HttpServletRequest request){
         ErrorResponse errorResponse = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
                 "Forbidden Error",
@@ -147,5 +148,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
+    /**
+     * JSON 요청 바디의 UUID 변환 실패 예외 처리
+     * @param ex
+     * @param headers
+     * @param status
+     * @param request
+     * @return
+     */
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Invalid input format. Please check your request data.",
+                ex.getMessage(),
+                request.getDescription(false));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 
 }

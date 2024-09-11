@@ -19,7 +19,6 @@ public class CompanyRequestDto {
     @NotNull(message = "User ID must be provided")
     private Long user_id;
 
-    @NotBlank(message = "Hub ID must be provided")
     @NotNull(message = "Hub ID must be provided")
     private UUID hub_id;
 
@@ -29,7 +28,7 @@ public class CompanyRequestDto {
 
     @NotBlank(message = "Company Type must be provided")
     @NotNull(message = "Company Type must be provided")
-    @Pattern(regexp = "^(생산업체|수령업체)$", message = "Company Type must be either '생산업체' or '수령업체'")
+    @Pattern(regexp = "^(MANUFACTURER|RECEIPT_COMPANY)$", message = "Company Type must be either 'MANUFACTURER' or 'RECEIPT_COMPANY'")
     private String type;
 
     @NotNull(message = "Company Address must be provided")

@@ -11,5 +11,5 @@ public class AuthRequestDto {
 
     private int status_code;
     private String result_message;
-    private AuthDto authDto;
+    private AuthDto data;
 }
