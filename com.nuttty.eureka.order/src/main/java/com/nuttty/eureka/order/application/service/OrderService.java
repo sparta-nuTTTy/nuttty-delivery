@@ -1,13 +1,11 @@
 package com.nuttty.eureka.order.application.service;
 
-import com.nuttty.eureka.order.presentation.dto.ResultResponse;
 import com.nuttty.eureka.order.domain.model.Order;
 import com.nuttty.eureka.order.domain.service.OrderDomainService;
 import com.nuttty.eureka.order.application.fegin.CompanyClient;
 import com.nuttty.eureka.order.application.fegin.ProductClient;
 import com.nuttty.eureka.order.application.fegin.dto.CompanyInfoDto;
 import com.nuttty.eureka.order.application.fegin.dto.ProductInfoDto;
-import com.nuttty.eureka.order.util.SuccessCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,7 @@ public class OrderService {
 
     // 주문생성
     @Transactional
-    public ResultResponse<OrderResponseDto> createOrder(OrderCreateDto orderCreateDto) {
+    public OrderResponseDto createOrder(OrderCreateDto orderCreateDto) {
         // 외부 서비스 호출: Company 서비스에서 회사 정보 조회
         log.info("회사 정보 조회 시작 : supplierId = {}, receiverId = {}", orderCreateDto.getSupplierId(), orderCreateDto.getReceiverId());
         CompanyInfoDto supplierCompany = companyClient.getCompany(orderCreateDto.getSupplierId());
@@ -60,7 +58,7 @@ public class OrderService {
 
 
         // 응답 DTO 생성
-        OrderResponseDto orderResponseDto = OrderResponseDto.builder()
+        return OrderResponseDto.builder()
                 .orderId(order.getOrderId())
                 .supplierId(order.getSupplierId())
                 .receiverId(order.getReceiverId())
@@ -71,13 +69,6 @@ public class OrderService {
                                 .orderAmount(orderProduct.getOrderAmount())
                                 .build())
                         .collect(Collectors.toList()))
-                .build();
-
-        // 주문 생성 성공 응답 반환
-        return ResultResponse.<OrderResponseDto>builder()
-                .data(orderResponseDto)
-                .resultMessage(SuccessCode.INSERT_SUCCESS.getCode())
-                .resultMessage(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
     }
 }
