@@ -3,17 +3,21 @@ package com.nuttty.eureka.company.application.service;
 import com.nuttty.eureka.company.application.dto.ProductDto;
 import com.nuttty.eureka.company.domain.model.Company;
 import com.nuttty.eureka.company.domain.model.Product;
+import com.nuttty.eureka.company.exception.exceptionsdefined.MissmatchException;
 import com.nuttty.eureka.company.infastructure.repository.CompanyRepository;
 import com.nuttty.eureka.company.infastructure.repository.ProductRepository;
 import com.nuttty.eureka.company.presentation.request.ProductRequestDto;
+import com.nuttty.eureka.company.presentation.request.ProductSearchRequestDto;
 import com.nuttty.eureka.company.presentation.request.ProductUpdateRequestDto;
 import com.nuttty.eureka.company.presentation.response.ProductDelResponseDto;
 import com.nuttty.eureka.company.presentation.response.ProductResponseDto;
+import com.nuttty.eureka.company.presentation.response.ProductSearchResponseDto;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.ws.rs.NotAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,12 +44,12 @@ public class ProductService {
     public ProductResponseDto createProduct(ProductRequestDto request, Long userId, String role) {
 
         if (role.equals("MASTER") || role.equals("HUB_MANAGER")) {
-            // 업체 ID, 허브 ID 업체에서 조회
+            // 업체 ID, 허브 ID 업체에서 조회 v
             Company findCompany = companyRepository.findByCompanyIdAndHubId(request.getCompany_id(), request.getHub_id()).orElseThrow(() ->
-                    new EntityNotFoundException("company_id: " + request.getCompany_id() + ", hub_id" + request.getHub_id() + " 일치하는 Company 없음"));
+                    new EntityNotFoundException("company_id: " + request.getCompany_id() + ", hub_id: " + request.getHub_id() + " 일치하는 Company 없음"));
 
-            // 상품 이름 중복 확인
-            if (productRepository.existsByProductName(request.getProduct_name())) {
+            // 같은 업체 내 상품 이름 중복 확인 v
+            if (productRepository.existsByNameAndCompanyIdAndHubId(request.getProduct_name(), request.getCompany_id(), request.getHub_id())) {
                 log.error(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
                 throw new DataIntegrityViolationException(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
             }
@@ -55,18 +59,12 @@ public class ProductService {
 
         }else { // HUB_COMPANY
 
-            // 업체 ID, 허브 ID 업체에서 조회
-            Company findCompany = companyRepository.findByCompanyIdAndHubId(request.getCompany_id(), request.getHub_id()).orElseThrow(() ->
-                    new EntityNotFoundException("company_id: " + request.getCompany_id() + ", hub_id" + request.getHub_id() + " 일치하는 Company 없음"));
+            // 업체 ID, 허브 ID, user ID (본인 업체 확인) v
+            Company findCompany = companyRepository.findByCompanyIdAndHubIdAndUserId(request.getCompany_id(), request.getHub_id(), userId).orElseThrow(() ->
+                    new EntityNotFoundException("본인 가게의 업체 ID, HUB ID 가 일치하여야 등록 가능합니다."));
 
-            // 로그인 ID, 업체에 등록된 userId 가 일치하는지 여부 (본인 확인)
-            if (!userId.equals(findCompany.getUserId())) {
-                log.error("본인 업체의 상품만 등록 가능합니다.");
-                throw new NotAuthorizedException("본인 업체의 상품만 등록 가능합니다.");
-            }
-
-            // 상품 이름 중복 확인
-            if (productRepository.existsByProductName(request.getProduct_name())) {
+            // 상품 이름 중복 확인 v
+            if (productRepository.existsByNameAndCompanyIdAndHubId(request.getProduct_name(), request.getCompany_id(), request.getHub_id())) {
                 log.error(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
                 throw new DataIntegrityViolationException(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
             }
@@ -89,7 +87,7 @@ public class ProductService {
 
         if (role.equals("MASTER") || role.equals("HUB_MANAGER")) {
 
-            // 상품 이름 중복 확인
+            // 상품 이름 중복 확인 v
             if (productRepository.existsByProductNameExcludeId(request.getProduct_name(), productId)) {
                 log.error(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
                 throw new DataIntegrityViolationException(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
@@ -103,12 +101,6 @@ public class ProductService {
 
         } else { // HUB_COMPANY
 
-            // 상품 이름 중복 확인
-            if (productRepository.existsByProductNameExcludeId(request.getProduct_name(), productId)) {
-                log.error(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
-                throw new DataIntegrityViolationException(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
-            }
-
             // 본인 업체 상품 변경인지 확인 (본인 여부)
             Company findCompany = companyRepository.findByUserId(userId).orElseThrow(() ->
                     new EntityNotFoundException("not found company with userId: " + userId));
@@ -118,7 +110,13 @@ public class ProductService {
 
             if (!findCompany.getId().equals(findProduct.getCompany().getId())) {
                 log.error("본인 업체의 상품만 수정 가능합니다.");
-                throw new NotAuthorizedException("본인 업체의 상품만 수정 가능합니다.");
+                throw new MissmatchException("본인 업체의 상품만 수정 가능합니다.");
+            }
+
+            // 상품 이름 중복 확인 v
+            if (productRepository.existsByProductNameExcludeId(request.getProduct_name(), productId)) {
+                log.error(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
+                throw new DataIntegrityViolationException(request.getProduct_name() + " 이미 존재하는 상품 이름입니다.");
             }
 
             Product updatedProduct = findProduct.update(request);
@@ -170,7 +168,7 @@ public class ProductService {
 
             if (!findCompany.getId().equals(findProduct.getCompany().getId())) {
                 log.error("본인 업체의 상품만 수정 가능합니다.");
-                throw new NotAuthorizedException("본인 업체의 상품만 수정 가능합니다.");
+                throw new MissmatchException("본인 업체의 상품만 수정 가능합니다.");
             }
 
             findProduct.addStock(quantity);
@@ -184,6 +182,7 @@ public class ProductService {
      * @param quantity
      * @return
      */
+    @Transactional
     public Integer removeStock(UUID productId, Integer quantity) {
 
         Product findProduct = productRepository.findById(productId).orElseThrow(() ->
@@ -198,11 +197,35 @@ public class ProductService {
      * @param quantity
      * @return
      */
+    @Transactional
     public Integer cancelStock(UUID productId, Integer quantity) {
 
         Product findProduct = productRepository.findById(productId).orElseThrow(() ->
                 new EntityNotFoundException("not found product with id: " + productId));
 
         return findProduct.cancelStock(quantity);
+    }
+
+    /**
+     * 상품 단건 조회 | 모두 허용
+     * @param productId
+     * @return
+     */
+    public ProductResponseDto findOneProduct(UUID productId) {
+
+        Product findProduct = productRepository.findById(productId).orElseThrow(() ->
+                new EntityNotFoundException("not found product with id: " + productId));
+
+        return new ProductResponseDto(HttpStatus.OK.value(), "product found", ProductDto.toDto(findProduct));
+    }
+
+    /**
+     * 상품 페이지 조회 | 모두 허용
+     * @param pageable
+     * @param condition
+     * @return
+     */
+    public Page<ProductSearchResponseDto> findAllProduct(Pageable pageable, ProductSearchRequestDto condition) {
+        return productRepository.findAllProduct(pageable, condition);
     }
 }
