@@ -1,11 +1,15 @@
 package com.nuttty.eureka.auth.application.service;
 
 import com.nuttty.eureka.auth.application.dto.UserInfoDto;
+import com.nuttty.eureka.auth.application.dto.UserSearchResponseDto;
 import com.nuttty.eureka.auth.domain.model.User;
 import com.nuttty.eureka.auth.domain.model.UserRoleEnum;
-import com.nuttty.eureka.auth.domain.repository.UserRepository;
+import com.nuttty.eureka.auth.infrastructure.repository.UserRepository;
 import com.nuttty.eureka.auth.presentation.request.UserRoleUpdateRequestDto;
+import com.nuttty.eureka.auth.presentation.request.UserSearchRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,5 +69,17 @@ public class UserService {
         user.delete(user.getEmail());
 
         return "[" + user.getUsername() + "] 회원님 탈퇴 완료.";
+    }
+
+
+    // 회원 검색
+    @Transactional(readOnly = true)
+    public Page<UserSearchResponseDto> searchUserInfo(String role, Pageable pageable, UserSearchRequestDto searchRequestDto) {
+        // 로그인 유저 권한 체크
+        if (!UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER)) {
+            throw new IllegalArgumentException("유저 정보를 검색 할 권한이 없습니다.");
+        }
+
+        return userRepository.findAllUser(pageable, searchRequestDto);
     }
 }
