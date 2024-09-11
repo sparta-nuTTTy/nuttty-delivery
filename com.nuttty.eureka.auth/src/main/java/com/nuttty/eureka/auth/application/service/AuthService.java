@@ -4,7 +4,7 @@ import com.nuttty.eureka.auth.application.dto.TokenDto;
 import com.nuttty.eureka.auth.application.dto.UserInfoDto;
 import com.nuttty.eureka.auth.domain.model.User;
 import com.nuttty.eureka.auth.domain.model.UserRoleEnum;
-import com.nuttty.eureka.auth.domain.repository.UserRepository;
+import com.nuttty.eureka.auth.infrastructure.repository.UserRepository;
 import com.nuttty.eureka.auth.presentation.request.LoginRequestDto;
 import com.nuttty.eureka.auth.presentation.request.SignupRequestDto;
 import io.jsonwebtoken.Jwts;
