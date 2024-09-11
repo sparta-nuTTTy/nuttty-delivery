@@ -1,10 +1,7 @@
 package com.nuttty.eureka.order.domain.model;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -13,6 +10,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "p_hub_routes")
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class HubRoute extends AuditEntity {
@@ -33,4 +31,13 @@ public class HubRoute extends AuditEntity {
 
     @Column(name = "route_info", nullable = false)
     private String routeInfo;
+
+    public static HubRoute create(UUID departureHubId, UUID arrivalHubId, LocalDateTime duration, String routeInfo) {
+        return HubRoute.builder()
+                .departureHubId(departureHubId)
+                .arrivalHubId(arrivalHubId)
+                .duration(duration)
+                .routeInfo(routeInfo)
+                .build();
+    }
 }
