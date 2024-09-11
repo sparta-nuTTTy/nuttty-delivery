@@ -23,7 +23,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 유저입니다."));
 
         // 로그인 유저의 정보와 조회 할 유저의 정보 일치 검사 & 로그인 유저 권한 체크
-        if(!loggedUserId.equals(targetUserId) && !UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER)) {
+        if (!loggedUserId.equals(targetUserId) && !UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER)) {
             throw new IllegalArgumentException("해당 유저의 정보를 조회 할 권한이 없습니다.");
         }
 
@@ -39,7 +39,7 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 유저입니다."));
 
         // 로그인 유저 권한 체크
-        if(!UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER)) {
+        if (!UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER)) {
             throw new IllegalArgumentException("해당 유저의 정보를 수정 할 권한이 없습니다.");
         }
 
@@ -47,5 +47,23 @@ public class UserService {
         user.updateUserRole(UserRoleEnum.valueOf(updateRequestDto.getRole()));
 
         return UserInfoDto.of(user);
+    }
+
+    // 회원 탈퇴
+    @Transactional
+    public String deleteUserInfo(String role, Long targetUserId) {
+        // 조회 유저 가입 여부 검사
+        User user = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new IllegalArgumentException("등록되지 않은 유저입니다."));
+
+        // 로그인 유저 권한 체크
+        if (!UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER)) {
+            throw new IllegalArgumentException("해당 유저의 정보를 삭제 할 권한이 없습니다.");
+        }
+
+        // 논리적 회원 삭제
+        user.delete(user.getEmail());
+
+        return "[" + user.getUsername() + "] 회원님 탈퇴 완료.";
     }
 }

@@ -40,4 +40,15 @@ public class UserController {
                 .resultMessage(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
     }
+
+    // 회원 탈퇴
+    @DeleteMapping("/{user_id}")
+    public ResultResponse<String> deleteUserInfo(@RequestHeader("X-User-Role") String role,
+                                                 @PathVariable("user_id") Long targetUserId) {
+        return ResultResponse.<String>builder()
+                .data(userService.deleteUserInfo(role, targetUserId))
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .resultMessage(SuccessCode.DELETE_SUCCESS.getMessage())
+                .build();
+    }
 }
