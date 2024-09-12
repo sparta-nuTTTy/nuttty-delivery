@@ -15,6 +15,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SecretKey secretKey;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Value("${spring.application.name}")
     private String issuer;
@@ -38,10 +40,12 @@ public class AuthService {
     @Value(("${jwt.access-expiration}"))
     private Long accessExpiration;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, @Value("${jwt.secret-key}") String secretKey) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, @Value("${jwt.secret-key}") String secretKey,
+                       RedisTemplate<String, Object> redisTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
+        this.redisTemplate = redisTemplate;
     }
 
     // 회원 가입
@@ -51,6 +55,7 @@ public class AuthService {
         if (userRepository.existsByEmail(signupRequestDto.getEmail())) {
             throw new DataIntegrityViolationException("사용중인 이메일 입니다.");
         }
+
         // 관리자 검증
         UserRoleEnum userRole = UserRoleEnum.valueOf(signupRequestDto.getRole());
         if (userRole.equals(UserRoleEnum.MASTER)) {
@@ -58,6 +63,7 @@ public class AuthService {
                 throw new InvalidAdminPasswordException("관리자 암호가 올바르지 않습니다.");
             }
         }
+
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(signupRequestDto.getPassword());
         // 유저 객체 생성 & 저장
@@ -73,10 +79,12 @@ public class AuthService {
         // 가입 여부 확인
         User user = userRepository.findByEmail(loginRequestDto.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 유저입니다."));
+
         // 비밀번호 일치 확인
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
+
         // 토큰 생성
         return createAccessToken(loginRequestDto.getEmail());
     }
@@ -87,6 +95,7 @@ public class AuthService {
         // 이메일로 가입한 유저 존재 여부 검사
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 유저입니다."));
+
         // 토큰 반환
         return userRepository.findByEmail(user.getEmail())
                 // user_id & role 로 JWT 토큰을 생성
