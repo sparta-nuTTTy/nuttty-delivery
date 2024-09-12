@@ -44,7 +44,9 @@ public class AuthController {
     // userId 존재여부 검증 API
     @GetMapping("/verify")
     public ResponseEntity<Boolean> verifyUser(final @RequestParam(value = "user_id") Long userId) {
-        Boolean response = authService.verifyUser(userId);
+        UserInfoDto userInfo = authService.verifyUser(userId);
+        Boolean response = (userInfo != null); // 유저가 존재하면 true, 존재하지 않으면 false
+
         return ResponseEntity.ok(response);
     }
 }

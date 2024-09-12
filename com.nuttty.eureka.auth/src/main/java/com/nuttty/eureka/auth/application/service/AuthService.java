@@ -14,6 +14,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -112,8 +113,12 @@ public class AuthService {
                 ).orElseThrow(() -> new EntityNotFoundException("Reject createAccessToken: 존재하지 않는 유저입니다."));
     }
 
+
     // userId 존재여부 검증 API
-    public Boolean verifyUser(Long userId) {
-        return userRepository.findById(userId).isPresent();
+    @Cacheable(cacheNames = "userInfoCache", key = "#userId")
+    public UserInfoDto verifyUser(Long userId) {
+        return userRepository.findById(userId)
+                .map(UserInfoDto::of) // User가 존재하면 UserInfoDto로 변환
+                .orElse(null); // 없으면 null 반환
     }
 }
