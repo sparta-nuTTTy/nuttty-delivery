@@ -46,7 +46,8 @@ public class OrderService {
             }
 
             // 재고 차감
-            productClient.decreaseStock(orderItem.getProductId(), orderItem.getOrderAmount());
+            Integer decreaseStock = productClient.decreaseStock(orderItem.getProductId(), orderItem.getOrderAmount());
+            log.info("상품 재고 차감 완료 : productId = {}, decreaseStock = {}", orderItem.getProductId(), decreaseStock);
         });
 
         // 허브 경로 조회(공급 업체 허브부터 수신 업체 허브까지 경로 조회)
