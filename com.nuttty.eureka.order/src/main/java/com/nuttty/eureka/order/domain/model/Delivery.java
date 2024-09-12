@@ -40,7 +40,7 @@ public class Delivery extends AuditEntity {
     private String deliveryReceiver;
 
     // Delivery와 DlieveryRuote 연관관계
-    @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DeliveryRoute> deliveryRoutes = new ArrayList<>();
 
     public static Delivery createDelivery(UUID departureHubId, UUID arrivalHubId, String deliveryAddress, String deliveryReceiver) {
@@ -58,11 +58,21 @@ public class Delivery extends AuditEntity {
         this.deliveryStatus = deliveryStatus;
     }
 
-    // 배송 경로 추가
-    public void addDeliveryRoute(DeliveryRoute deliveryRoute) {
-        this.deliveryRoutes.add(deliveryRoute);
-        if (deliveryRoute.getDelivery() != this) {
-            deliveryRoute.setDelivery(this);
+    // 배송 경로 리스트 추가
+    public void addDeliveryRoutes(List<HubRoute> hubRoutes) {
+        DeliveryRoute prevDeliveryRoute = null;
+
+        for (HubRoute hubRoute : hubRoutes) {
+            DeliveryRoute currentDeliveryRoute = DeliveryRoute.create(this, hubRoute);
+
+            // 이전 경로가 있다면, 그 경로의 다음 경로로 현재 경로를 설정
+            if (prevDeliveryRoute != null) {
+                prevDeliveryRoute.setNextDeliveryRoute(currentDeliveryRoute);
+            }
+
+            // 현재 경로를 리스트에 추가
+            this.deliveryRoutes.add(currentDeliveryRoute);
+            prevDeliveryRoute = currentDeliveryRoute;
         }
     }
 }

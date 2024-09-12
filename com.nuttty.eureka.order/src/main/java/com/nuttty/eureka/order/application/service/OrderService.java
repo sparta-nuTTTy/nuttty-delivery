@@ -1,5 +1,6 @@
 package com.nuttty.eureka.order.application.service;
 
+import com.nuttty.eureka.order.domain.model.HubRoute;
 import com.nuttty.eureka.order.domain.model.Order;
 import com.nuttty.eureka.order.domain.service.OrderDomainService;
 import com.nuttty.eureka.order.application.fegin.CompanyClient;
@@ -11,18 +12,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.nuttty.eureka.order.presentation.dto.OrderProductDto.*;
 import static com.nuttty.eureka.order.presentation.dto.OrederDto.*;
 
 @Service
-@Slf4j
+@Slf4j(topic = "OrderService")
 @RequiredArgsConstructor
 public class OrderService {
     private final ProductClient productClient;
     private final CompanyClient companyClient;
     private final OrderDomainService orderDomainService;
+    private final HubRouteService hubRouteService;
 
     // 주문생성
     @Transactional
@@ -46,15 +49,18 @@ public class OrderService {
             productClient.decreaseStock(orderItem.getProductId(), orderItem.getOrderAmount());
         });
 
-        // 허브 경로 정보 조회 및 생성(학습후 구현 예정)
-
+        // 허브 경로 조회(공급 업체 허브부터 수신 업체 허브까지 경로 조회)
+        log.info("허브 경로 조회 시작: supplierHubId = {}, receiverHubId = {}", supplierCompany.getData().getHubId(), receiverCompany.getData().getHubId());
+        List<HubRoute> allHubRoutes = hubRouteService.findAllHubRoutes(supplierCompany.getData().getHubId(), receiverCompany.getData().getHubId());
+        log.info("허브 경로 조회 완료: allHubRoute = {}", allHubRoutes);
 
         // 주문 생성
         Order order = orderDomainService.createOrder(orderCreateDto,
                 supplierCompany.getData().getHubId(),
                 receiverCompany.getData().getHubId(),
                 receiverCompany.getData().getAddress(),
-                receiverCompany.getData().getName());
+                receiverCompany.getData().getName(),
+                allHubRoutes);
 
 
         // 응답 DTO 생성
