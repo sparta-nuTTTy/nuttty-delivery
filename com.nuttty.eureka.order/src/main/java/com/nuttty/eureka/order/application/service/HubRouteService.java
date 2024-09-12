@@ -22,19 +22,18 @@ public class HubRouteService {
     private final HubClient hubClient;
     private final HubRouteRepository hubRouteRepository;
 
-    // 허브 경로 생성
-    // 허브 경로는 허브 목록을 조회하여 각 객체를 리스트로 저장
-    // 허브간 이동 정보 테이블(p_hub_route)에 저장
     @Transactional
     public void createAllHubRoutes() {
         // 허브 목록 조회
         List<ContentDto> content = hubClient.getAllHubs().getContent();
-        List<HubDto> hubDto = content.get(0).getHubDto();
+        List<HubDto> hubDtos = content.get(0).getHubDto();
+        log.info("허브 목록 조회 | size: {}", hubDtos.size());
 
         // 인접 허브 간 이동 경로 저장
-        for (int i = 0; i < hubDto.size() - 1; i++) {
-            HubDto currentHub = hubDto.get(i);
-            HubDto nextHub = hubDto.get(i + 1);
+        for (int i = 0; i < hubDtos.size() - 1; i++) {
+            HubDto currentHub = hubDtos.get(i);
+            HubDto nextHub = hubDtos.get(i + 1);
+            log.info("현재 허브: {}, 다음 허브: {}", currentHub.getName(), nextHub.getName());
 
             // 두 허브 간 이동 경로 생성
             createHubRoute(currentHub, nextHub);
@@ -47,6 +46,7 @@ public class HubRouteService {
         // 허브 간 경로 생성
         String routeInfo  = departureHub.getName() + " -> " + arrivalHub.getName();
 
+        log.info("출발 허브 ID: {}, 도착 허브 ID: {}, 경로 정보: {}", departureHub.getHubId(), arrivalHub.getHubId(), routeInfo);
         HubRoute hubRoute = HubRoute.create(
                 departureHub.getHubId(),
                 arrivalHub.getHubId(),
