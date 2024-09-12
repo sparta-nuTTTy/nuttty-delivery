@@ -17,8 +17,8 @@ public class HubRoute extends AuditEntity {
     @Id
     @GeneratedValue
     @UuidGenerator
-    @Column(name = "hub_route-Id", updatable = false, nullable = false)
-    private String hubRouteId;
+    @Column(name = "hub_route_id", updatable = false, nullable = false)
+    private UUID hubRouteId;
 
     @Column(name = "departure_hub_id", nullable = false)
     private UUID departureHubId;
