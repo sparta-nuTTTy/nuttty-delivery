@@ -41,6 +41,7 @@ public class Delivery extends AuditEntity {
 
     // Delivery와 DlieveryRuote 연관관계
     @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<DeliveryRoute> deliveryRoutes = new ArrayList<>();
 
     public static Delivery createDelivery(UUID departureHubId, UUID arrivalHubId, String deliveryAddress, String deliveryReceiver) {
