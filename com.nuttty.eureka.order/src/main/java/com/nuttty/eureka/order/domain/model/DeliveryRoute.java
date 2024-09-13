@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "p_delivery_routes")
 @Getter
@@ -15,7 +17,7 @@ public class DeliveryRoute extends AuditEntity {
     @GeneratedValue
     @UuidGenerator
     @Column(name = "delivery_route_id", updatable = false, nullable = false)
-    private String deliveryRouteId;
+    private UUID deliveryRouteId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_id", nullable = false)
@@ -32,12 +34,15 @@ public class DeliveryRoute extends AuditEntity {
     private HubRoute hubRoute;
 
 
-    public static DeliveryRoute create(Delivery delivery, DeliveryRoute nextDeliveryRoute, HubRoute hubRoute) {
+    public static DeliveryRoute create(Delivery delivery, HubRoute hubRoute) {
         return DeliveryRoute.builder()
                 .delivery(delivery)
-                .nextDeliveryRoute(nextDeliveryRoute)
                 .hubRoute(hubRoute)
                 .build();
+    }
+
+    public void setNextDeliveryRoute(DeliveryRoute nextDeliveryRoute) {
+        this.nextDeliveryRoute = nextDeliveryRoute;
     }
 
     public void setDelivery(Delivery delivery) {

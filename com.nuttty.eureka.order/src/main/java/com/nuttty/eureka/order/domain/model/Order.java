@@ -2,6 +2,7 @@ package com.nuttty.eureka.order.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Builder(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Slf4j(topic = "Order")
 public class Order extends AuditEntity {
     @Id
     @GeneratedValue
@@ -23,6 +25,7 @@ public class Order extends AuditEntity {
     private UUID orderId;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -46,7 +49,11 @@ public class Order extends AuditEntity {
     }
 
     public void addOrderProducts(List<OrderProduct> orderProducts) {
-        this.orderProducts.addAll(orderProducts);
+        log.info("주문 상품을 주문에 추가 : orderProducts = {}", orderProducts.size());
+        orderProducts.forEach(orderProduct -> {
+            orderProduct.setOrder(this);
+            this.orderProducts.add(orderProduct);
+        });
         this.totalPrice = this.orderProducts.stream()
                 .map(OrderProduct::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);

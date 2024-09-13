@@ -45,4 +45,8 @@ public class OrderProduct extends AuditEntity {
                 .orderAmount(orderAmount)
                 .build();
     }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }
