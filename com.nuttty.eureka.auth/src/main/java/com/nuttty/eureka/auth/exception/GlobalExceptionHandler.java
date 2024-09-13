@@ -1,7 +1,9 @@
 package com.nuttty.eureka.auth.exception;
 
 import com.nuttty.eureka.auth.application.dto.ErrorResponse;
+import com.nuttty.eureka.auth.exception.custom.DeliveryPersonAlreadyExistsException;
 import com.nuttty.eureka.auth.exception.custom.InvalidAdminPasswordException;
+import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -102,5 +104,29 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 request.getDescription(false));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    // 배송 담당자로 지정된 회원 예외
+    @ExceptionHandler(DeliveryPersonAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleDeliveryPersonAlreadyExists(DeliveryPersonAlreadyExistsException ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ex.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    // FeignClient를 통한 예외 - 404 NotFound
+    @ExceptionHandler(FeignException.NotFound.class)
+    public ResponseEntity<ErrorResponse> handleFeignNotFound(FeignException.NotFound ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                "Not Found",
+                ex.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 }

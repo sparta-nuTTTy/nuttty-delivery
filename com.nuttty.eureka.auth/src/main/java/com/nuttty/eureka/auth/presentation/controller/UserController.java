@@ -88,7 +88,7 @@ public class UserController {
     private void validateUserRole(String role) {
 
         if (!UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER)) {
-            throw new AccessDeniedException("해당 유저의 정보를 삭제 할 권한이 없습니다.");
+            throw new AccessDeniedException("접근 가능한 권한이 아닙니다.");
         }
     }
 }

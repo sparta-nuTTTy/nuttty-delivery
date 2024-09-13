@@ -5,6 +5,6 @@ import com.nuttty.eureka.auth.presentation.request.UserSearchRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface JpaUserRepository {
+public interface UserRepositoryCustom {
     Page<UserSearchResponseDto> findAllUser(Pageable pageable, UserSearchRequestDto searchRequestDto);
 }
