@@ -1,5 +1,6 @@
 package com.nuttty.eureka.order.application.fegin.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class ProductInfoDto {
     private Integer statusCode;
     private String resultMessage;
-    private ProductDataDto data;
+    @JsonProperty("productDto")
+    private ProductDto productDto;
 }
