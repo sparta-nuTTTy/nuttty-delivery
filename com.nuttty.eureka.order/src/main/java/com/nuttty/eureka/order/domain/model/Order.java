@@ -28,6 +28,10 @@ public class Order extends AuditEntity {
     @Builder.Default
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false)
+    private OrderStatus orderStatus;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "delivery_id", nullable = false)
     private Delivery delivery;
@@ -45,6 +49,7 @@ public class Order extends AuditEntity {
         return Order.builder()
                 .receiverId(receiverId)
                 .supplierId(supplierId)
+                .orderStatus(OrderStatus.ORDERED)
                 .build();
     }
 
