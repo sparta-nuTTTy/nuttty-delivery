@@ -4,6 +4,7 @@ import com.nuttty.eureka.order.domain.model.*;
 import com.nuttty.eureka.order.presentation.dto.OrederDto.OrderCreateDto;
 import com.nuttty.eureka.order.domain.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j(topic = "OrderDomainService")
 @RequiredArgsConstructor
 public class OrderDomainService {
     private final OrderRepository orderRepository;
@@ -25,12 +27,14 @@ public class OrderDomainService {
                              List<HubRoute> hubRoutes) {
 
         // 주문 생성(Order)
+        log.info("주문 생성 시작 : receiverId = {}, supplierId = {}", orderCreateDto.getReceiverId(), orderCreateDto.getSupplierId());
         Order order = Order.createOrder(
                 orderCreateDto.getReceiverId(),
                 orderCreateDto.getSupplierId()
         );
 
         // 주문 상품 생성(OrderProduct)
+        log.info("주문 상품 생성 시작 : productItems = {}", orderCreateDto.getProductItems());
         List<OrderProduct> orderProducts = orderCreateDto.getProductItems().stream()
                 .map(productItem -> OrderProduct.createOrderProduct(
                         order,

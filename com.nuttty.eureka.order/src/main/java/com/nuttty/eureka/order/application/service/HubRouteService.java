@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Slf4j(topic = "HubRouteService")
@@ -59,22 +57,52 @@ public class HubRouteService {
 
     }
 
-    // 허브 간 경로 조회(전체 - 링크드 리스트)
+    // 허브 간 경로 조회(전체 - DFS 방식으로 경로 탐색)
     @Transactional(readOnly = true)
-    public List<HubRoute> findAllHubRoutes(UUID starHubId, UUID endHubId) {
+    public List<HubRoute> findAllHubRoutes(UUID startHubId, UUID endHubId) {
+        // 경로 저장할 리스트
         List<HubRoute> routes = new ArrayList<>();
 
-        UUID currentHubId = starHubId;
+        // 방문한 허브를 추적하기
+        Set<UUID> visitedHubs = new HashSet<>();
 
-        while (!currentHubId.equals(endHubId)) {
-            // 출발 허브부터 도착 허브까지 경로 조회
-            HubRoute route = hubRouteRepository.findByDepartureHubId(currentHubId);
-            routes.add(route);
+        // DFS로 경로 탐색
+        if (findRouteDFS(startHubId, endHubId, visitedHubs, routes)) {
+            Collections.reverse(routes);
+            // 경로를 찾으면 리스트 반환
+            return routes;
+        } else {
+            // 경로를 찾지 못하면 빈 리스트 반환
+            return Collections.emptyList();
+        }
+    }
 
-            // 다음 허브로 이동
-            currentHubId = route.getArrivalHubId();
+    private boolean findRouteDFS(UUID currentHubId, UUID endHubId, Set<UUID> visitedHubs, List<HubRoute> routes) {
+        // 도착 허브에 도달한 경우 true 반환
+        if (currentHubId.equals(endHubId)) {
+            return true;
         }
 
-        return routes;
+        // 이미 방문한 허브라면 다시 방문 하지않음.
+        if (visitedHubs.contains(currentHubId)) {
+            return false;
+        }
+
+        // 현재 허브를 방문한 허브로 추가
+        visitedHubs.add(currentHubId);
+
+        // 현재 허브에서 이동 가능한 허브 목록 조회
+        List<HubRoute> hubRoutes = hubRouteRepository.findByDepartureHubId(currentHubId);
+
+        for (HubRoute hubRoute : hubRoutes) {
+            // 다음 허브로 이동
+            if (findRouteDFS(hubRoute.getArrivalHubId(), endHubId, visitedHubs, routes)) {
+                // 경로 추가
+                routes.add(hubRoute);
+                return true;
+            }
+        }
+
+        return false;
     }
 }
