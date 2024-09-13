@@ -4,7 +4,7 @@ import com.nuttty.eureka.auth.application.dto.QUserInfoDto;
 import com.nuttty.eureka.auth.application.dto.UserInfoDto;
 import com.nuttty.eureka.auth.application.dto.UserSearchResponseDto;
 import com.nuttty.eureka.auth.domain.model.UserRoleEnum;
-import com.nuttty.eureka.auth.domain.repository.JpaUserRepository;
+import com.nuttty.eureka.auth.domain.repository.UserRepositoryCustom;
 import com.nuttty.eureka.auth.presentation.request.UserSearchRequestDto;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,8 @@ import java.util.List;
 import static com.nuttty.eureka.auth.domain.model.QUser.user;
 import static org.springframework.util.StringUtils.hasText;
 
-public class UserRepositoryImpl implements JpaUserRepository {
+@Repository
+public class UserRepositoryImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -50,9 +52,9 @@ public class UserRepositoryImpl implements JpaUserRepository {
                         emailContains(condition.getEmail()),
                         user.isDelete.eq(false));
 
-        if (pageable.getSort().isEmpty()){
+        if (pageable.getSort().isEmpty()) {
             query.orderBy(user.createdAt.asc());
-        } else{
+        } else {
             Sort sort = pageable.getSort();
             sort.forEach(order -> {
                 String property = order.getProperty();
