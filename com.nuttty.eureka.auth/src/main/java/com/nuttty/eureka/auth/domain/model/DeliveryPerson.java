@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
-@EntityListeners(value = AuditingEntityListener.class)
+@EntityListeners(value = {AuditingEntityListener.class})
 public class DeliveryPerson extends AuditEntity {
 
     @Id

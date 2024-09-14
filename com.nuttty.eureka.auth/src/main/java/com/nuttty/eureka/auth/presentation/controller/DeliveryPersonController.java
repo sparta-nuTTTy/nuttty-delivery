@@ -20,21 +20,39 @@ public class DeliveryPersonController {
     // 배송 담당자 등록
     @PostMapping
     public ResultResponse<DeliveryPersonInfoDto> createDeliveryPerson(@RequestHeader("X-User-Role") String role,
-                                                                      @RequestBody DeliveryPersonCreateDto createDto){
+                                                                      @RequestHeader("X-User-Id") Long userId,
+                                                                      @RequestBody DeliveryPersonCreateDto createDto) {
 
         validateUserRole(role);
 
         return ResultResponse.<DeliveryPersonInfoDto>builder()
-                .data(deliveryPersonService.createDeliveryPerson(createDto))
+                .data(deliveryPersonService.createDeliveryPerson(role, userId, createDto))
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMessage(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
     }
 
+    // 배송 담당자 개별 조회
+    @GetMapping("/{delivery_person_id}")
+    public ResultResponse<DeliveryPersonInfoDto> getDeliveryPersonInfo(@RequestHeader("X-User-Role") String role,
+                                                                       @RequestHeader("X-User-Id") Long userId,
+                                                                       @PathVariable("delivery_person_id") Long deliveryPersonId) {
+
+        if (UserRoleEnum.valueOf(role).equals(UserRoleEnum.HUB_COMPANY)) {
+            throw new AccessDeniedException("접근 가능한 권한이 아닙니다.");
+        }
+
+        return ResultResponse.<DeliveryPersonInfoDto>builder()
+                .data(deliveryPersonService.getDeliveryPersonInfo(role, userId, deliveryPersonId))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMessage(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+    }
+
 
     // 권한 체크
-    private void validateUserRole(String role){
-        if (!UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER) && !UserRoleEnum.valueOf(role).equals(UserRoleEnum.HUB_MANAGER)){
+    private void validateUserRole(String role) {
+        if (!UserRoleEnum.valueOf(role).equals(UserRoleEnum.MASTER) && !UserRoleEnum.valueOf(role).equals(UserRoleEnum.HUB_MANAGER)) {
             throw new AccessDeniedException("접근 가능한 권한이 아닙니다.");
         }
     }

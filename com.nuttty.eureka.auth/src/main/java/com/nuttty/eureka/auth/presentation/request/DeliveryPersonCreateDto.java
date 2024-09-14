@@ -10,4 +10,6 @@ public class DeliveryPersonCreateDto {
     private UUID hubId;
     private String deliveryPersonType;
     private String slackId;
+
+    public void setHubId(UUID hubId) {this.hubId = hubId;}
 }
