@@ -23,29 +23,20 @@ public class DeliveryRoute extends AuditEntity {
     @JoinColumn(name = "delivery_id", nullable = false)
     private Delivery delivery;
 
-    // 자기 참조 관계로 다음 경로 정보를 가짐
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "next_delivery_route_id")
-    private DeliveryRoute nextDeliveryRoute;
+    // 경로 순서
+    @Column(name = "order_index", nullable = false)
+    private int orderIndex;
 
     // 허브간 이동 정보 테이블(허브간 이동 고정 경로)
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hub_route_id", nullable = false)
     private HubRoute hubRoute;
 
-
-    public static DeliveryRoute create(Delivery delivery, HubRoute hubRoute) {
+    public static DeliveryRoute create(Delivery delivery, HubRoute hubRoute , int orderIndex) {
         return DeliveryRoute.builder()
                 .delivery(delivery)
                 .hubRoute(hubRoute)
+                .orderIndex(orderIndex)
                 .build();
-    }
-
-    public void setNextDeliveryRoute(DeliveryRoute nextDeliveryRoute) {
-        this.nextDeliveryRoute = nextDeliveryRoute;
-    }
-
-    public void setDelivery(Delivery delivery) {
-        this.delivery = delivery;
     }
 }

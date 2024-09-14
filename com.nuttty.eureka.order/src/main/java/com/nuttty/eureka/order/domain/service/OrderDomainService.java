@@ -1,10 +1,14 @@
 package com.nuttty.eureka.order.domain.service;
 
 import com.nuttty.eureka.order.domain.model.*;
+import com.nuttty.eureka.order.presentation.dto.OrederDto;
 import com.nuttty.eureka.order.presentation.dto.OrederDto.OrderCreateDto;
-import com.nuttty.eureka.order.domain.repository.OrderRepository;
+import com.nuttty.eureka.order.infrastructure.repository.OrderRepository;
+import com.nuttty.eureka.order.presentation.dto.OrederDto.OrderSearchDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,5 +65,18 @@ public class OrderDomainService {
         order.setDelivery(delivery);
 
         return orderRepository.save(order);
+    }
+
+    // 주문 단건 조회
+    @Transactional(readOnly = true)
+    public Order getOrder(UUID orderId) {
+        return orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId = " + orderId));
+    }
+
+    // 주문 동적 검색 및 페이징 조회
+    @Transactional(readOnly = true)
+    public Page<OrederDto.OrderResponseDto> searchOrders(OrderSearchDto condition, Pageable pageable) {
+        return orderRepository.findSearchOrders(condition, pageable);
     }
 }
