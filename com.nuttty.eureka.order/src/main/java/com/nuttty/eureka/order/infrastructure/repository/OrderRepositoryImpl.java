@@ -5,20 +5,24 @@ import com.nuttty.eureka.order.application.fegin.dto.CompanyInfoDto;
 import com.nuttty.eureka.order.domain.model.DeliveryRoute;
 import com.nuttty.eureka.order.domain.model.Order;
 import com.nuttty.eureka.order.domain.model.OrderStatus;
+import com.nuttty.eureka.order.domain.model.QOrder;
 import com.nuttty.eureka.order.domain.repository.OrderRepositoryCustom;
 import com.nuttty.eureka.order.presentation.dto.OrederDto.OrderSearchDto;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.nuttty.eureka.order.domain.model.QOrder.*;
@@ -34,32 +38,55 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
     @Override
     public Page<OrderResponseDto> findSearchOrders(OrderSearchDto condition, Pageable pageable) {
-    List<Order> orders = queryFactory
-            .selectFrom(order)
-            .where(orderIdEq(condition.getOrderId()),
-                    receiverIdEq(condition.getReceiverId()),
-                    orderStatusEq(condition.getStatus()),
-                    createdAtGoeAndLoe(condition.getStartDate(), condition.getEndDate())
-                    )
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+        List<Order> orders = queryFactory
+                .selectFrom(order)
+                .where(orderIdEq(condition.getOrderId()),
+                        receiverIdEq(condition.getReceiverId()),
+                        orderStatusEq(condition.getStatus()),
+                        createdAtGoeAndLoe(condition.getStartDate(), condition.getEndDate()),
+                        order.isDelete.eq(false))
+                .offset(pageable.getOffset())
+                .orderBy(getSortOrder(pageable.getSort()))
+                .limit(pageable.getPageSize())
+                .fetch();
 
-    // 카운트 쿼리 지연 로딩
-    JPAQuery<Order> count = queryFactory
-            .selectFrom(order)
-            .where(orderIdEq(condition.getOrderId()),
-                    receiverIdEq(condition.getReceiverId()),
-                    orderStatusEq(condition.getStatus()),
-                    createdAtGoeAndLoe(condition.getStartDate(), condition.getEndDate()));
+        // 카운트 쿼리 지연 로딩
+        JPAQuery<Order> count = queryFactory
+                .selectFrom(order)
+                .where(orderIdEq(condition.getOrderId()),
+                        receiverIdEq(condition.getReceiverId()),
+                        orderStatusEq(condition.getStatus()),
+                        createdAtGoeAndLoe(condition.getStartDate(), condition.getEndDate()),
+                        order.isDelete.eq(false));
 
-    // 외부 서비스 호출 및 데이터 결합
-    List<OrderResponseDto> result = orders.stream()
-            .map(this::mapToOrderResponseDto)
-            .toList();
 
-    return PageableExecutionUtils.getPage(result, pageable, count::fetchCount);
+            // 외부 서비스 호출 및 데이터 결합
+        List<OrderResponseDto> result = orders.stream()
+                .map(this::mapToOrderResponseDto)
+                .toList();
+
+        return PageableExecutionUtils.getPage(result, pageable, count::fetchCount);
 }
+
+    // 정렬 조건
+    private OrderSpecifier<?>[] getSortOrder(Sort sort) {
+        return sort.stream()
+                .map(order -> {
+                    switch (order.getProperty()) {
+                        case "createdAt" -> {
+                            return order.getDirection().isAscending() ? QOrder.order.createdAt.asc() : QOrder.order.createdAt.desc();
+                        }
+                        case "updatedAt" -> {
+                            return order.getDirection().isAscending() ? QOrder.order.updatedAt.asc() : QOrder.order.updatedAt.desc();
+                        }
+                        default -> {
+                            return null; // 유효 하지 않은 정렬 조건은 무시
+                        }
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toArray(OrderSpecifier[]::new);
+    }
 
     private OrderResponseDto mapToOrderResponseDto(Order order) {
         // 회사 정보 조회
