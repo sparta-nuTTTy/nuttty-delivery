@@ -28,7 +28,7 @@ public class DeliveryRoute extends AuditEntity {
     private int orderIndex;
 
     // 허브간 이동 정보 테이블(허브간 이동 고정 경로)
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hub_route_id", nullable = false)
     private HubRoute hubRoute;
 

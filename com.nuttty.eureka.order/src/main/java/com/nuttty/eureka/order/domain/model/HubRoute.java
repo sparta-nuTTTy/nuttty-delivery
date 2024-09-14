@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -31,6 +33,9 @@ public class HubRoute extends AuditEntity {
 
     @Column(name = "route_info", nullable = false)
     private String routeInfo;
+
+    @OneToMany(mappedBy = "hubRoute", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeliveryRoute> deliveryRoutes = new ArrayList<>();
 
     public static HubRoute create(UUID departureHubId, UUID arrivalHubId, LocalDateTime duration, String routeInfo) {
         return HubRoute.builder()
