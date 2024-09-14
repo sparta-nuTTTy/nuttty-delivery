@@ -62,4 +62,11 @@ public class OrderDomainService {
 
         return orderRepository.save(order);
     }
+
+    // 주문 단건 조회
+    @Transactional(readOnly = true)
+    public Order getOrder(UUID orderId) {
+        return orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId = " + orderId));
+    }
 }
