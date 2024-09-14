@@ -175,4 +175,34 @@ public class DeliveryPersonService {
 
         return DeliveryPersonInfoDto.of(deliveryPerson);
     }
+
+
+    // 배송 담당자 정보 삭제
+    @Transactional
+    @CacheEvict(cacheNames = {"deliveryPersonInfoCache", "deliveryPersonSearchInfoCache"}, allEntries = true)
+    public String deleteDeliveryPerson(String role, Long userId, String email, Long deliveryPersonId) {
+        // 배송 담당자 등록 여부 검사
+        DeliveryPerson deliveryPerson = deliveryPersonRepository.findById(deliveryPersonId)
+                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 배송 담당자입니다."));
+
+        // 권한 == 허브 관리자
+        if (UserRoleEnum.valueOf(role).equals(UserRoleEnum.HUB_MANAGER)) {
+            // 업체 배송 담당자 경우 허브 Id 존재 - 소속 허브Id 관리자와 로그인 유저 일치 여부 검사
+            if (deliveryPerson.getDeliveryPersonType().equals(DeliveryPersonTypeEnum.COMPANY_DELIVERY_PERSON)) {
+                // 배송 담당자의 허브의 허브 관리자 Id 가져오기
+                HubRequestDto hubInfo = hubClient.findOneHub(deliveryPerson.getHubId()).getBody();
+                if (hubInfo == null) {
+                    throw new EntityNotFoundException("등록되지 않은 허브입니다.");
+                }
+                // 로그인한 유저와 허브 관리자 Id 비교
+                if (!userId.equals(hubInfo.getHubDto().getUser_id())) {
+                    throw new AccessDeniedException("허브 관리자님 허브 소속의 배송담당자가 아닙니다.");
+                }
+            }
+        }
+
+        deliveryPerson.delete(email);
+
+        return deliveryPersonId + "님 배송 담당자 정보 삭제 완료";
+    }
 }

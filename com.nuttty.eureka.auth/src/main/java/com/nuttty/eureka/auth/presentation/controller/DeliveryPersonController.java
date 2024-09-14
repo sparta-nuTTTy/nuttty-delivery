@@ -55,13 +55,28 @@ public class DeliveryPersonController {
     public ResultResponse<DeliveryPersonInfoDto> updateDeliveryPersonType(@RequestHeader("X-User-Role") String role,
                                                                           @RequestHeader("X-User-Id") Long userId,
                                                                           @PathVariable("delivery_person_id") Long deliveryPersonId,
-                                                                          @RequestBody DeliveryPersonTypeUpdateRequestDto updateDto){
+                                                                          @RequestBody DeliveryPersonTypeUpdateRequestDto updateDto) {
         validateUserRole(role);
 
         return ResultResponse.<DeliveryPersonInfoDto>builder()
                 .data(deliveryPersonService.updateDeliveryPersonType(role, userId, deliveryPersonId, updateDto))
                 .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
                 .resultMessage(SuccessCode.UPDATE_SUCCESS.getMessage())
+                .build();
+    }
+
+    // 배송 담당자 삭제
+    @DeleteMapping("/{delivery_person_id}")
+    public ResultResponse<String> deleteDeliveryPerson(@RequestHeader("X-User-Role") String role,
+                                                       @RequestHeader("X-User-Id") Long userId,
+                                                       @RequestHeader("X-User-Email") String email,
+                                                       @PathVariable("delivery_person_id") Long deliveryPersonId) {
+        validateUserRole(role);
+
+        return ResultResponse.<String>builder()
+                .data(deliveryPersonService.deleteDeliveryPerson(role, userId, email, deliveryPersonId))
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .resultMessage(SuccessCode.DELETE_SUCCESS.getMessage())
                 .build();
     }
 
