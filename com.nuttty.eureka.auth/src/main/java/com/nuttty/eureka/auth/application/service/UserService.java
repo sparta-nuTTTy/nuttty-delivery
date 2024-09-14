@@ -38,7 +38,7 @@ public class UserService {
     // 회원 권한 수정 - 토큰 재발급
     @Transactional
     @CachePut(cacheNames = "userInfoCache", key = "#userId")
-    @CacheEvict(cacheNames = "{userInfoCache, userSearchInfoCache}", allEntries = true)
+    @CacheEvict(cacheNames = {"userInfoCache", "userSearchInfoCache"}, allEntries = true)
     public UserInfoDto updateUserRole(Long userId, UserRoleUpdateRequestDto updateRequestDto) {
         // 조회 유저 가입 여부 검사
         User user = userRepository.findById(userId)
@@ -52,7 +52,7 @@ public class UserService {
 
     // 회원 탈퇴
     @Transactional
-    @CacheEvict(cacheNames = "{userInfoCache, userSearchInfoCache}", allEntries = true)
+    @CacheEvict(cacheNames = {"userInfoCache", "userSearchInfoCache"}, allEntries = true)
     public String deleteUserInfo(Long userId) {
         // 조회 유저 가입 여부 검사
         User user = userRepository.findById(userId)
