@@ -4,6 +4,7 @@ import com.nuttty.eureka.auth.application.dto.DeliveryPersonInfoDto;
 import com.nuttty.eureka.auth.application.service.DeliveryPersonService;
 import com.nuttty.eureka.auth.domain.model.UserRoleEnum;
 import com.nuttty.eureka.auth.presentation.request.DeliveryPersonCreateDto;
+import com.nuttty.eureka.auth.presentation.request.DeliveryPersonTypeUpdateRequestDto;
 import com.nuttty.eureka.auth.util.ResultResponse;
 import com.nuttty.eureka.auth.util.SuccessCode;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,21 @@ public class DeliveryPersonController {
                 .data(deliveryPersonService.getDeliveryPersonInfo(role, userId, deliveryPersonId))
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .resultMessage(SuccessCode.SELECT_SUCCESS.getMessage())
+                .build();
+    }
+
+    // 배송 담당자 정보 수정
+    @PatchMapping("/{delivery_person_id}")
+    public ResultResponse<DeliveryPersonInfoDto> updateDeliveryPersonType(@RequestHeader("X-User-Role") String role,
+                                                                          @RequestHeader("X-User-Id") Long userId,
+                                                                          @PathVariable("delivery_person_id") Long deliveryPersonId,
+                                                                          @RequestBody DeliveryPersonTypeUpdateRequestDto updateDto){
+        validateUserRole(role);
+
+        return ResultResponse.<DeliveryPersonInfoDto>builder()
+                .data(deliveryPersonService.updateDeliveryPersonType(role, userId, deliveryPersonId, updateDto))
+                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                .resultMessage(SuccessCode.UPDATE_SUCCESS.getMessage())
                 .build();
     }
 

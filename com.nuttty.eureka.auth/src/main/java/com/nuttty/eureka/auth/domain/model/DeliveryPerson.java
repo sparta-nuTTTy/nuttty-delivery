@@ -44,4 +44,11 @@ public class DeliveryPerson extends AuditEntity {
                 .slackId(slackId)
                 .build();
     }
+
+
+    // 배송 담당자 정보 수정
+    public void updateDeliveryPersonType(DeliveryPersonTypeEnum deliveryPersonType, UUID hubId){
+        this.deliveryPersonType = deliveryPersonType;
+        this.hubId = hubId;
+    }
 }
