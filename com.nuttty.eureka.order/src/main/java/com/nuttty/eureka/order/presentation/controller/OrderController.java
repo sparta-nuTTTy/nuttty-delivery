@@ -80,6 +80,10 @@ public class OrderController {
      *                 - supplierId: 공급자 ID <br>
      *                 - receiverId: 수신자 ID <br>
      * @param Pageable: 페이징 정보
+     *                - page: 페이지 번호 <br>
+     *                - size: 페이지 크기 <br>
+     *                - sort: 정렬 조건 createdAt, updatedAt <br>
+     *                - direction: 정렬 방향 ASC, DESC <br>
      */
     @GetMapping
     public ResultResponse<Page<OrderResponseDto>> searchOrders(OrderSearchDto condition, @PageableDefault(size = 20) Pageable Pageable) {
