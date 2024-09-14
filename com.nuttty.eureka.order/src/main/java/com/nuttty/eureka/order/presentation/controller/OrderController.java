@@ -5,6 +5,9 @@ import com.nuttty.eureka.order.presentation.dto.ResultResponse;
 import com.nuttty.eureka.order.util.SuccessCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -64,6 +67,32 @@ public class OrderController {
                 .resultMessage(SuccessCode.SELECT_SUCCESS.getMessage())
                 .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
                 .data(orderResponseDto)
+                .build();
+    }
+
+    /**
+     * 주문 동적 검색 및 페이징 조회
+     * @param condition: 주문 검색 조건
+     *                 - startDate: 주문 생성 시작일 <br>
+     *                 - endDate: 주문 생성 종료일 <br>
+     *                 - status: 주문 상태 <br>
+     *                 - orderId: 주문 ID <br>
+     *                 - supplierId: 공급자 ID <br>
+     *                 - receiverId: 수신자 ID <br>
+     * @param Pageable: 페이징 정보
+     */
+    @GetMapping
+    public ResultResponse<Page<OrderResponseDto>> searchOrders(OrderSearchDto condition, @PageableDefault(size = 20) Pageable Pageable) {
+        log.info("주문 검색 및 페이징 조회 시도 중 | condition: {}, pageable: {}", condition, Pageable);
+
+        Page<OrderResponseDto> orderResponseDtos = orderService.searchOrders(condition, Pageable);
+
+        log.info("주문 검색 및 페이징 조회 성공 | response: {}", orderResponseDtos);
+
+        return ResultResponse.<Page<OrderResponseDto>>builder()
+                .resultMessage(SuccessCode.SELECT_SUCCESS.getMessage())
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .data(orderResponseDtos)
                 .build();
     }
 }
