@@ -7,6 +7,7 @@ import com.nuttty.eureka.order.presentation.dto.DeliveryDto.DeliveryResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -17,6 +18,7 @@ public class DeliveryService {
     private final OrderRepository orderRepository;
 
     // 배송 단건 조회
+    @Transactional(readOnly = true)
     public DeliveryResponseDto getDelivery(UUID deliveryId) {
         log.info("배송 단건 조회 시작 | deliveryId: {}", deliveryId);
 
@@ -37,9 +39,4 @@ public class DeliveryService {
                         .toList())
                 .build();
     }
-
-
-
-
-
 }

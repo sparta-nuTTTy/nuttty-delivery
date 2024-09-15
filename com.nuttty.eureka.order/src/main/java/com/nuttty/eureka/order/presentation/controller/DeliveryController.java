@@ -18,6 +18,13 @@ import static com.nuttty.eureka.order.presentation.dto.DeliveryDto.*;
 public class DeliveryController {
     private final DeliveryService deliveryService;
 
+    /**
+     * 배송 단건 조회
+     * @param deliveryId: 배송 ID
+     * @param userId: 사용자 ID
+     * @param role: 사용자 권한
+     * @return: 배송 조회 응답 DTO
+     */
     @GetMapping("/{deliveryId}")
     public ResultResponse<DeliveryResponseDto> getDelivery(
             @PathVariable("deliveryId") UUID deliveryId,
