@@ -2,6 +2,7 @@ package com.nuttty.eureka.ai.application.service;
 
 import com.nuttty.eureka.ai.application.dto.ai.AiDto;
 import com.nuttty.eureka.ai.application.dto.ai.AiSearchRequestDto;
+import com.nuttty.eureka.ai.application.dto.deliveryperson.DeliveryPersonSearchDto;
 import com.nuttty.eureka.ai.domain.model.Ai;
 import com.nuttty.eureka.ai.domain.service.DeliveryPersonService;
 import com.nuttty.eureka.ai.domain.service.GeminiApiService;
@@ -22,8 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -87,25 +88,33 @@ public class AiService {
     @Scheduled(cron = "0 0 8 * * *")
     @Transactional
     // TODO 잼민이 처리시간 길어질 경우 Read Time OUT 인가 터짐. 안쓰는게 나을거 같기도 함. 나중에 물어볼 것
+    // TODO 슬랙 메세지 저장 해야함
     public void sendOrderToHubTransferPersonViaSlack() throws IOException, SlackApiException, URISyntaxException {
 
         // 전일 오전 8시 ~ 금일 오전 7시 59분 59초 허브 별 주문건 가져오기
         String order = hubMappingOrderService.getOrder();
 
-        // 공통 허브 배송 담당자 슬랙 ID 리스트
-        Map<UUID, List<String>> deliveryPersonSlackId = deliveryPersonService.findAllCommonDeliveryPersonSlackId();
+        // 공통 허브 배송 담당자 리스트
+        List<DeliveryPersonSearchDto> findDeliveryPerson = deliveryPersonService.findAllCommonDeliveryPersonSlackId();
+
+        // 공통 허브 배송 담당자 slackID
+        List<String> slackIdList = new ArrayList<>();
+
+        // 공통 허브 배송 담당자 ID
+        List<UUID> deliveryPersonIdList = new ArrayList<>();
+        for (DeliveryPersonSearchDto deliveryPersonDto : findDeliveryPerson) {
+            slackIdList.add(deliveryPersonDto.getSlack_id());
+            deliveryPersonIdList.add(deliveryPersonDto.getHub_id());
+        }
 
         // Gemini API 통해 허브 별 주문정보 메세지 요약 시키기
         String message = geminiApiService.callGemini(order);
 
         // 공통 허브 배송 담당자들에게 슬랙 메세지 보내기
-        List<String> slackId = deliveryPersonSlackId.values().stream()
-                .flatMap(List::stream)
-                .toList();
-        slackService.sendMessage(message, slackId);
+        slackService.sendMessage(message, slackIdList);
 
         // 배송 담당자 받은 허브 별 주문 답변 DB 저장
-        for (UUID uuid : deliveryPersonSlackId.keySet()) {
+        for (UUID uuid : deliveryPersonIdList) {
             aiRepository.save(Ai.createAi(message, uuid));
         }
 

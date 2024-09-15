@@ -3,6 +3,7 @@ package com.nuttty.eureka.ai.domain.service;
 import com.nuttty.eureka.ai.application.client.DeliveryPersonClient;
 import com.nuttty.eureka.ai.application.dto.deliveryperson.DeliveryPersonDto;
 import com.nuttty.eureka.ai.application.dto.deliveryperson.DeliveryPersonRequestDto;
+import com.nuttty.eureka.ai.application.dto.deliveryperson.DeliveryPersonSearchDto;
 import com.nuttty.eureka.ai.exception.exceptionsdefined.ClientException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -22,23 +23,24 @@ public class DeliveryPersonService {
     private final DeliveryPersonClient deliveryPersonClient;
 
     /**
-     * 공통 허브 배송 담당자 슬랙 아이디 조회
+     * 공통 허브 배송 담당자 전체 조회
      * @return
      */
-    public Map<UUID, List<String>> findAllCommonDeliveryPersonSlackId() {
+    @Transactional
+    public List<DeliveryPersonSearchDto> findAllCommonDeliveryPersonSlackId() {
 
         // 공통 허브 배송 담당자 조회
         DeliveryPersonRequestDto hubTransferPerson = null;
         try {
-            hubTransferPerson = deliveryPersonClient.findAllCommonDeliveryPerson(20, "HUB_TRANSFER_PERSON");
+            hubTransferPerson = deliveryPersonClient.findAllCommonDeliveryPerson(20, "HUB_TRANSFER_PERSON", "MASTER");
         } catch (FeignException e) {
             int statusCode = e.status();
             String errorMessage = e.getMessage();
-            log.error("Error occurred with status code: " + statusCode + ", message: " + e.getMessage());
+            log.error("Error occurred with status code: " + statusCode + ", message: " + e);
             throw new ClientException(errorMessage, statusCode);
 
         } catch (Exception e) {
-            log.error("Error occurred with exception: " + e.getMessage());
+            log.error("Error occurred with exception: " + e);
             throw new ClientException(e.getMessage());
         }
 
@@ -47,17 +49,15 @@ public class DeliveryPersonService {
             throw new ClientException("Hub transfer person is null");
         }
 
+        // 공통 허브 배송 담당자 객체 꺼내기
         Page<DeliveryPersonDto> deliveryPersonDto = hubTransferPerson.getData();
+        List<DeliveryPersonDto> content = deliveryPersonDto.getContent();
+        List<DeliveryPersonSearchDto> result = new ArrayList<>();
 
-        // 공통 허브 배송 담당자 슬랙 ID 리스트
-        Map<UUID, List<String>> slackIdMap = new HashMap<>();
-
-        for (DeliveryPersonDto personDto : deliveryPersonDto) {
-            UUID deliveryPersonId = personDto.getDeliveryPersonId();
-
-            slackIdMap.computeIfAbsent(deliveryPersonId, k -> new ArrayList<>()).add(personDto.getSlackId());
+        for (DeliveryPersonDto personDto : content) {
+            result = personDto.getDeliveryPersonInfoList();
         }
 
-        return slackIdMap;
+        return result;
     }
 }

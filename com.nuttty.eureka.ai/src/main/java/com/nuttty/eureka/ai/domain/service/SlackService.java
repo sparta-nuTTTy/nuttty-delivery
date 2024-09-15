@@ -34,11 +34,11 @@ public class SlackService {
      * @throws IOException
      * @throws SlackApiException
      */
+    @Transactional
     public void sendMessage(String message, List<String> slackId) throws IOException, SlackApiException, URISyntaxException {
         Slack slack = Slack.getInstance();
 
         for (String slackUserId : slackId) {
-
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .token(slackToken)
                     .channel(slackUserId)  // Slack 사용자 ID

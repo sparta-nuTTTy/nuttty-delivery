@@ -29,6 +29,7 @@ public class GeminiApiService {
      * @return
      * @throws JsonProcessingException
      */
+    @Transactional
     public String callGemini(String message) throws JsonProcessingException {
         // 요청 URL
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyAAEe26JCvfcuuzyl3lQc0T-B-QwLtClkA";
