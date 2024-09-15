@@ -86,6 +86,7 @@ public class AiService {
      */
     @Scheduled(cron = "0 0 8 * * *")
     @Transactional
+    // TODO 잼민이 처리시간 길어질 경우 Read Time OUT 인가 터짐. 안쓰는게 나을거 같기도 함. 나중에 물어볼 것
     public void sendOrderToHubTransferPersonViaSlack() throws IOException, SlackApiException, URISyntaxException {
 
         // 전일 오전 8시 ~ 금일 오전 7시 59분 59초 허브 별 주문건 가져오기
