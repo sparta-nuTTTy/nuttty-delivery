@@ -38,7 +38,7 @@ public class CompanyService {
     private final AuthClient authClient;
 
     /**
-     * 업체 생성 | 마스터, 허브 관리자, 허브 업체(본인만) 허용
+     * 업체 생성 | 마스터, 허브 관리자(본인 허브 업체만), 허브 업체(본인만) 허용
      * @param request
      * @param userId
      * @param role
@@ -88,7 +88,7 @@ public class CompanyService {
 
             return new CompanyResponseDto(HttpStatus.CREATED.value(), "company created", CompanyDto.toDto(savedCompany));
 
-        }  else { // HUB_COMPANY 일 경우
+        }  else if(role.equals("HUB_COMPANY")){ // HUB_COMPANY 일 경우
 
             // 로그인 한 유저와 등록하려는 유저가 같은지 확인 v
             if (!request.getUser_id().equals(userId)) {
@@ -120,11 +120,61 @@ public class CompanyService {
             Company savedCompany = companyRepository.save(request.toEntity());
 
             return new CompanyResponseDto(HttpStatus.CREATED.value(), "company created", CompanyDto.toDto(savedCompany));
+
+        } else { // HUB_MANAGER
+
+            // 허브 ID 존재 유무 확인 v
+            HubRequestDto findHub = null;
+            try {
+                findHub = hubClient.findByHubId(request.getHub_id());
+            } catch (RuntimeException e) {
+                log.error("Hub not found");
+                throw new EntityNotFoundException("Hub not found");
+            }
+
+            // 대리 등록하는 허브 관리자의 허브 ID 와 같은지 조회
+            // 다른 허브의 업체는 등록 불가
+            if (!findHub.getHubDto().getUser_id().equals(userId)) {
+                log.error("본인 허브의 업체만 등록 가능합니다.");
+                throw new DelegationException("본인 허브의 업체만 등록 가능합니다.");
+            }
+
+            // 유저 ID 존재 유무 확인 v
+            AuthRequestDto findAuth = null;
+            try {
+                findAuth = authClient.findUserById(userId, request.getUser_id());
+
+            } catch (RuntimeException e) {
+                log.error("User not found");
+                throw new EntityNotFoundException("User not found");
+            }
+
+            // 허브 업체권한 유저인지 확인 v
+            if (!findAuth.getData().getRole().equals("HUB_COMPANY")) {
+                log.error("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
+                throw new DelegationException("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
+            }
+
+            //  이미 등록된 유저인지 확인 v
+            if (companyRepository.existsByUserId(request.getUser_id())) {
+                log.error(request.getUser_id() + " 이미 등록된 User ID 입니다.");
+                throw new DataIntegrityViolationException(request.getUser_id() + " 이미 등록된 User ID 입니다.");
+            }
+
+            // 주소 중복 확인 v
+            if (companyRepository.existsByAddress(request.getAddress())) {
+                log.error(request.getAddress() + " 이 주소는 이미 등록된 주소 입니다.");
+                throw new DataIntegrityViolationException(request.getAddress() + " 이 주소는 이미 등록된 주소 입니다.");
+            }
+
+            Company savedCompany = companyRepository.save(request.toEntity());
+
+            return new CompanyResponseDto(HttpStatus.CREATED.value(), "company created", CompanyDto.toDto(savedCompany));
         }
     }
 
     /**
-     * 업체 수정 | 마스터, 허브 관리자, 허브 업체(본인만) 허용
+     * 업체 수정 | 마스터, 허브 관리자(본인 허브 업체만), 허브 업체(본인만) 허용
      * @param request
      * @param companyId
      * @param userId
@@ -134,7 +184,7 @@ public class CompanyService {
     @Transactional
     public CompanyResponseDto updateCompany(CompanyRequestDto request, UUID companyId, Long userId, String role) {
 
-        if (role.equals("MASTER") || role.equals("HUB_MANAGER")) {
+        if (role.equals("MASTER")) {
 
             // companyId 존재 유무 확인 및 조회 v
             Company findCompany = companyRepository.findById(companyId).orElseThrow(() ->
@@ -180,7 +230,7 @@ public class CompanyService {
             Company updatedCompany = findCompany.update(request);
             return new CompanyResponseDto(HttpStatus.OK.value(), "company updated", CompanyDto.toDto(updatedCompany));
 
-        } else { // HUB_COMPANY 일 경우
+        } else if (role.equals("HUB_COMPANY")){ // HUB_COMPANY 일 경우
 
             // companyId 존재 유무 확인 및 조회 v
             Company findCompany = companyRepository.findById(companyId).orElseThrow(() ->
@@ -199,6 +249,59 @@ public class CompanyService {
             } catch (RuntimeException e) {
                 log.error("Hub not found");
                 throw new EntityNotFoundException("Hub not found");
+            }
+
+            // 다른 업체에 등록된 주소 인지 확인 v
+            if (companyRepository.existsByAddressAndExcludeId(request.getAddress(), companyId)) {
+                log.error(request.getAddress() + " 이 주소는 이미 등록된 주소 입니다.");
+                throw new DataIntegrityViolationException(request.getAddress() + " 이 주소는 이미 등록된 주소 입니다.");
+            }
+
+            Company updatedCompany = findCompany.update(request);
+            return new CompanyResponseDto(HttpStatus.OK.value(), "company updated", CompanyDto.toDto(updatedCompany));
+
+        }else { // HUB_MANAGER
+
+            // 허브 ID 존재 유무 확인 v
+            HubRequestDto findHub = null;
+            try {
+                findHub = hubClient.findByHubId(request.getHub_id());
+            } catch (RuntimeException e) {
+                log.error("Hub not found");
+                throw new EntityNotFoundException("Hub not found");
+            }
+
+            // 대리 등록하는 허브 관리자의 허브 ID 와 같은지 조회
+            // 다른 허브의 업체는 등록 불가
+            if (!findHub.getHubDto().getUser_id().equals(userId)) {
+                log.error("본인 허브의 업체만 수정 가능합니다.");
+                throw new DelegationException("본인 허브의 업체만 수정 가능합니다.");
+            }
+
+            // companyId 존재 유무 확인 및 조회 v
+            Company findCompany = companyRepository.findById(companyId).orElseThrow(() ->
+                    new EntityNotFoundException("not found company"));
+
+            // 존재하는 유저 ID 인지 확인 v
+            AuthRequestDto findAuth = null;
+            try {
+                findAuth = authClient.findUserById(userId, request.getUser_id());
+
+            } catch (RuntimeException e) {
+                log.error("User not found");
+                throw new EntityNotFoundException("User not found");
+            }
+
+            // 허브 업체 유저인지 확인 v
+            if (!findAuth.getData().getRole().equals("HUB_COMPANY")) {
+                log.error("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
+                throw new DelegationException("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
+            }
+
+            // 다른 업체에 유저 ID 로 등록된 업체가 존재 유무 확인 v
+            if (companyRepository.existsByUserIdAndExcludeId(request.getUser_id(), companyId)) {
+                log.error(request.getUser_id() + " 다른 업체에 이미 등록되어 있습니다.");
+                throw new DataIntegrityViolationException(request.getUser_id() + " 다른 업체에 이미 등록되어 있습니다.");
             }
 
             // 다른 업체에 등록된 주소 인지 확인 v
