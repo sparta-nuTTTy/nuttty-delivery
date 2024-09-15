@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -31,4 +32,6 @@ public interface CompanyRepository extends JpaRepository<Company, UUID>, Company
 
     @Query("select c from Company c where c.id = :id and c.hubId = :hubId and c.userId = :userId")
     Optional<Company> findByCompanyIdAndHubIdAndUserId(@Param("id") UUID companyId,@Param("hubId") UUID hubId,@Param("userId") Long userId);
+
+    List<Company> findByIdIn(List<UUID> id);
 }

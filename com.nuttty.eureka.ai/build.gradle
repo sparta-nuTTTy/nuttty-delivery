@@ -28,6 +28,9 @@ ext {
 }
 
 dependencies {
+	// slack
+	implementation 'com.slack.api:slack-api-client:1.30.0'
+
 	// zipin, micrometer
 	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
 	implementation 'io.github.openfeign:feign-micrometer'

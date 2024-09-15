@@ -1,5 +1,6 @@
 package com.nuttty.eureka.company.presentation.controller;
 
+import com.nuttty.eureka.company.application.dto.CompanyDto;
 import com.nuttty.eureka.company.application.service.CompanyService;
 import com.nuttty.eureka.company.presentation.request.CompanyRequestDto;
 import com.nuttty.eureka.company.presentation.request.CompanySearchRequestDto;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -112,6 +114,20 @@ public class CompanyController {
 
         Page<CompanySearchResponseDto> response = companyService.findAllCompany(pageable, condition);
         log.info("업체 페이지 조회 완료");
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 공급업체 ID = CompanyID, 공급 업체 ID 로 업체 리스트 조회
+     * @param supplierId
+     * @return
+     */
+    @GetMapping("/companies/list")
+    public ResponseEntity<?> findAllSupplierIdOfCompany(@RequestParam("supplierId") List<UUID> supplierId) {
+        log.info("supplierId 로 업체 전체 조회 시도 중 | supplierId: {}", supplierId);
+
+        List<CompanyDto> response = companyService.findAllSupplierIdOfCompany(supplierId);
+        log.info("supplierId 로 업체 전체 조회 완료");
         return ResponseEntity.ok(response);
     }
 

@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -248,5 +249,19 @@ public class CompanyService {
     public Page<CompanySearchResponseDto> findAllCompany(Pageable pageable, CompanySearchRequestDto condition) {
 
         return companyRepository.findAllCompany(pageable, condition);
+    }
+
+    /**
+     * 공급업체 ID = CompanyID, 공급 업체 ID 로 업체 리스트 조회
+     * @param supplierId
+     * @return
+     */
+    public List<CompanyDto> findAllSupplierIdOfCompany(List<UUID> supplierId) {
+
+        List<Company> companies = companyRepository.findByIdIn(supplierId);
+
+        return companies.stream()
+                .map(CompanyDto::toDto)
+                .toList();
     }
 }
