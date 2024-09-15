@@ -32,11 +32,15 @@ public class DeliveryRoute extends AuditEntity {
     @JoinColumn(name = "hub_route_id", nullable = false)
     private HubRoute hubRoute;
 
-    public static DeliveryRoute create(Delivery delivery, HubRoute hubRoute , int orderIndex) {
+    public static DeliveryRoute create(Delivery delivery, HubRoute hubRoute, int orderIndex) {
         return DeliveryRoute.builder()
                 .delivery(delivery)
                 .hubRoute(hubRoute)
                 .orderIndex(orderIndex)
                 .build();
     }
+
+//    public void updateDeliveryPerson(Long deliveryPersonId) {
+//        this.deliveryPersonId = deliveryPersonId;
+//    }
 }
