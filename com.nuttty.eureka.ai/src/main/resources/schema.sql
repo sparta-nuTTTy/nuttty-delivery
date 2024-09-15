@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX unique_delivery_manager_idx ON p_ai (delivery_manager_id) WHERE is_delete = false;
