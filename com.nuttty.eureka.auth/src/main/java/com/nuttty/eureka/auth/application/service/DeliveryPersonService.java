@@ -2,6 +2,7 @@ package com.nuttty.eureka.auth.application.service;
 
 import com.nuttty.eureka.auth.application.client.HubClient;
 import com.nuttty.eureka.auth.application.dto.DeliveryPersonInfoDto;
+import com.nuttty.eureka.auth.application.dto.DeliveryPersonSearchResponseDto;
 import com.nuttty.eureka.auth.domain.model.DeliveryPerson;
 import com.nuttty.eureka.auth.domain.model.DeliveryPersonTypeEnum;
 import com.nuttty.eureka.auth.domain.model.User;
@@ -10,6 +11,7 @@ import com.nuttty.eureka.auth.exception.custom.DeliveryPersonAlreadyExistsExcept
 import com.nuttty.eureka.auth.infrastructure.repository.DeliveryPersonRepository;
 import com.nuttty.eureka.auth.infrastructure.repository.UserRepository;
 import com.nuttty.eureka.auth.presentation.request.DeliveryPersonCreateDto;
+import com.nuttty.eureka.auth.presentation.request.DeliveryPersonSearchRequestDto;
 import com.nuttty.eureka.auth.presentation.request.DeliveryPersonTypeUpdateRequestDto;
 import com.nuttty.eureka.auth.presentation.request.HubRequestDto;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -122,7 +126,7 @@ public class DeliveryPersonService {
     // 배송 담당자 정보 수정
     @Transactional
     @CachePut(cacheNames = "deliveryPersonInfoCache", key = "#role + ':' + #userId + ':' + #deliveryPersonId")
-    @CacheEvict(cacheNames = {"deliveryPersonInfoCache", "deliveryPersonSearchInfoCache"}, allEntries = true)
+    @CacheEvict(cacheNames = "deliveryPersonSearchInfoCache", allEntries = true)
     public DeliveryPersonInfoDto updateDeliveryPersonType(String role, Long userId, Long deliveryPersonId, DeliveryPersonTypeUpdateRequestDto updateDto) {
         // 배송 담당자 등록 여부 검사
         DeliveryPerson deliveryPerson = deliveryPersonRepository.findById(deliveryPersonId)
@@ -204,5 +208,14 @@ public class DeliveryPersonService {
         deliveryPerson.delete(email);
 
         return deliveryPersonId + "님 배송 담당자 정보 삭제 완료";
+    }
+
+
+    // 배송 담당자 전체 조회
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames = "deliveryPersonSearchInfoCache", key = "{#searchRequestDto.user_id, #searchRequestDto.delivery_person_id, #searchRequestDto.hub_id, #searchRequestDto.slack_id, #searchRequestDto.type}")
+    public Page<DeliveryPersonSearchResponseDto> searchDeliveryPerson(Pageable pageable, DeliveryPersonSearchRequestDto searchRequestDto) {
+
+        return deliveryPersonRepository.findAllDeliveryPerson(pageable, searchRequestDto);
     }
 }
