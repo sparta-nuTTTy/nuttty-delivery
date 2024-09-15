@@ -29,6 +29,9 @@ public class Delivery extends AuditEntity {
     @Column(name = "arrival_hub_id", nullable = false)
     private UUID arrivalHubId;
 
+    @Column(name = "delivery_person_id")
+    private Long deliveryPersonId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "delivery_status", nullable = false)
     private DeliveryStatus deliveryStatus;
