@@ -25,6 +25,10 @@ spring:
           uri: lb://order-service
           predicates:
             - Path=/api/v1/orders/**, /api/v1/deliveries/**, /api/v1/delivery-routes/**
+        - id: ai-service
+          uri: lb://ai-service
+          predicates:
+            - Path=/api/v1/ai/**
       discovery:
         locator:
           enabled: true
