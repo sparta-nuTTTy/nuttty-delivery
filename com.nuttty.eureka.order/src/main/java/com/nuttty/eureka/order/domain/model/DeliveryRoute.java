@@ -43,4 +43,8 @@ public class DeliveryRoute extends AuditEntity {
                 .orderIndex(orderIndex)
                 .build();
     }
+
+    public void updateDeliveryPerson(Long deliveryPersonId) {
+        this.deliveryPersonId = deliveryPersonId;
+    }
 }
