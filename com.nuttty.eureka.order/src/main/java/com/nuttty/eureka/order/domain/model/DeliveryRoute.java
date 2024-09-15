@@ -27,10 +27,6 @@ public class DeliveryRoute extends AuditEntity {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 
-    // 배송 담당자 ID
-    @Column(name = "delivery_person_id")
-    private Long deliveryPersonId;
-
     // 허브간 이동 정보 테이블(허브간 이동 고정 경로)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hub_route_id", nullable = false)
@@ -44,7 +40,7 @@ public class DeliveryRoute extends AuditEntity {
                 .build();
     }
 
-    public void updateDeliveryPerson(Long deliveryPersonId) {
-        this.deliveryPersonId = deliveryPersonId;
-    }
+//    public void updateDeliveryPerson(Long deliveryPersonId) {
+//        this.deliveryPersonId = deliveryPersonId;
+//    }
 }
