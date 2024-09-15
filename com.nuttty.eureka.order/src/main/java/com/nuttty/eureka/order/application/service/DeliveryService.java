@@ -3,9 +3,12 @@ package com.nuttty.eureka.order.application.service;
 import com.nuttty.eureka.order.domain.model.DeliveryRoute;
 import com.nuttty.eureka.order.domain.model.Order;
 import com.nuttty.eureka.order.infrastructure.repository.OrderRepository;
+import com.nuttty.eureka.order.presentation.dto.DeliveryDto;
 import com.nuttty.eureka.order.presentation.dto.DeliveryDto.DeliveryResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,5 +41,14 @@ public class DeliveryService {
                         .map(DeliveryRoute::getDeliveryRouteId)
                         .toList())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DeliveryResponseDto> getDeliveries(DeliveryDto.DeliverySaerch condition, Pageable pageable) {
+        log.info("배송 검색 및 페이징 조회 시작 | condition: {}, pageable: {}", condition, pageable);
+
+        Page<DeliveryResponseDto> deliveryResponseDtos = orderRepository.findOrdersByCondition(condition, pageable);
+
+        return deliveryResponseDtos;
     }
 }
