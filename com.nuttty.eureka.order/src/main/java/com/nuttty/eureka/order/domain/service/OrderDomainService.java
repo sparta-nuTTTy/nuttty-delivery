@@ -93,4 +93,19 @@ public class OrderDomainService {
                 .orderId(order.getOrderId())
                 .build();
     }
+
+    // 주문 상태 변경
+    @Transactional
+    public OrederDto.OrderUpdateResponseDto updateOrder(UUID orderId, OrederDto.OrderUpdateDto orderUpdateDto) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId = " + orderId));
+
+        // 주문 상태 변경
+        order.updateOrderStatus(orderUpdateDto.getOrderStatus());
+
+        return OrederDto.OrderUpdateResponseDto.builder()
+                .orderId(order.getOrderId())
+                .orderStatus(order.getOrderStatus())
+                .build();
+    }
 }

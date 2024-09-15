@@ -79,7 +79,12 @@ public class Order extends AuditEntity {
         }
     }
 
+    public void updateOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
     public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
     }
+
 }

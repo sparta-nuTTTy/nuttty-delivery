@@ -1,12 +1,15 @@
 package com.nuttty.eureka.order.presentation.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.nuttty.eureka.order.domain.model.DeliveryStatus;
 import com.nuttty.eureka.order.domain.model.OrderStatus;
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -83,4 +86,19 @@ public interface OrederDto {
     class OrderCancelResponseDto {
         private UUID orderId;
     }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    class OrderUpdateDto {
+        @JsonProperty("order_status")
+        private OrderStatus orderStatus;
+    }
+
+    @Getter
+    @Builder
+    class OrderUpdateResponseDto {
+        private UUID orderId;
+        private OrderStatus orderStatus;
+    }
+
 }

@@ -143,4 +143,9 @@ public class OrderService {
     public OrderCancelResponseDto cancelOrder(UUID orderId, String email) {
         return orderDomainService.cancelOrder(orderId, email);
     }
+
+    @Transactional
+    public OrderUpdateResponseDto updateOrder(UUID orderId, OrderUpdateDto orderUpdateDto) {
+        return orderDomainService.updateOrder(orderId, orderUpdateDto);
+    }
 }
