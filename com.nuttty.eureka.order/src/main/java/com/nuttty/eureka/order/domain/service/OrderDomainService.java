@@ -79,4 +79,33 @@ public class OrderDomainService {
     public Page<OrederDto.OrderResponseDto> searchOrders(OrderSearchDto condition, Pageable pageable) {
         return orderRepository.findSearchOrders(condition, pageable);
     }
+
+    // 주문 삭제
+    @Transactional
+    public OrederDto.OrderCancelResponseDto cancelOrder(UUID orderId, String email) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId = " + orderId));
+
+        // 더티 체킹을 이용한 주문 소프트 삭제
+        order.soft(email);
+
+        return OrederDto.OrderCancelResponseDto.builder()
+                .orderId(order.getOrderId())
+                .build();
+    }
+
+    // 주문 상태 변경
+    @Transactional
+    public OrederDto.OrderUpdateResponseDto updateOrder(UUID orderId, OrederDto.OrderUpdateDto orderUpdateDto) {
+        Order order = orderRepository.findByOrderId(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId = " + orderId));
+
+        // 주문 상태 변경
+        order.updateOrderStatus(orderUpdateDto.getOrderStatus());
+
+        return OrederDto.OrderUpdateResponseDto.builder()
+                .orderId(order.getOrderId())
+                .orderStatus(order.getOrderStatus())
+                .build();
+    }
 }

@@ -99,4 +99,51 @@ public class OrderController {
                 .data(orderResponseDtos)
                 .build();
     }
+
+    /**
+     * 주문 소프트 삭제
+     * @param orderId: 주문 ID
+     * @param userId: 사용자 ID
+     * @param role: 사용자 권한
+     * @param email: 사용자 이메일
+     * @return: 주문 소프트 삭제 응답 DTO
+     */
+    @DeleteMapping("/{order_id}")
+    public ResultResponse<OrderCancelResponseDto> cancelOrder(
+            @PathVariable("order_id") UUID orderId,
+            @RequestHeader(value = "X-User-Id") Long userId,
+            @RequestHeader(value = "X-User-Role") String role,
+            @RequestHeader(value = "X-User-Email") String email
+    ) {
+
+        log.info("주문 취소 시도 중 | orderId: {}", orderId);
+        OrderCancelResponseDto orderCancelResponseDto = orderService.cancelOrder(orderId, email);
+
+        log.info("주문 취소 성공 | response: {}", orderCancelResponseDto);
+
+        return ResultResponse.<OrderCancelResponseDto>builder()
+                .resultMessage(SuccessCode.DELETE_SUCCESS.getMessage())
+                .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
+                .data(orderCancelResponseDto)
+                .build();
+    }
+
+    @PatchMapping("/{order_id}")
+    public ResultResponse<OrderUpdateResponseDto> updateOrder(
+            @PathVariable("order_id") UUID orderId,
+            @RequestBody OrderUpdateDto orderUpdateDto,
+            @RequestHeader(value = "X-User-Id") Long userId,
+            @RequestHeader(value = "X-User-Role") String role
+    ) {
+        log.info("주문 수정 시도 중 | orderId: {}, request: {}, loginUser: {}", orderId, orderUpdateDto, userId);
+        OrderUpdateResponseDto orderUpdateResponseDto = orderService.updateOrder(orderId, orderUpdateDto);
+
+        log.info("주문 수정 성공 | response: {}", orderUpdateResponseDto);
+
+        return ResultResponse.<OrderUpdateResponseDto>builder()
+                .resultMessage(SuccessCode.UPDATE_SUCCESS.getMessage())
+                .resultCode(SuccessCode.UPDATE_SUCCESS.getStatus())
+                .data(orderUpdateResponseDto)
+                .build();
+    }
 }

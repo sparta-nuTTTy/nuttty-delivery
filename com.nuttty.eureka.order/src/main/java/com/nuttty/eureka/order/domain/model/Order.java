@@ -64,7 +64,27 @@ public class Order extends AuditEntity {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public void soft(String email) {
+        delete(email);
+
+        this.delivery.delete(email);
+
+        List<DeliveryRoute> deliveryRoutes = this.delivery.getDeliveryRoutes();
+        for (DeliveryRoute deliveryRoute : deliveryRoutes) {
+            deliveryRoute.delete(email);
+        }
+
+        for (OrderProduct or : orderProducts) {
+            or.delete(email);
+        }
+    }
+
+    public void updateOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
     public void setDelivery(Delivery delivery) {
         this.delivery = delivery;
     }
+
 }
