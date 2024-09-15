@@ -28,6 +28,7 @@ public class HubMappingOrderService {
     /**
      * 허브 별 주문 정보 매핑
      */
+    @Transactional
     public String getOrder() {
 
         // 전일 오전 8시에서 현재 오전 7시 59분
