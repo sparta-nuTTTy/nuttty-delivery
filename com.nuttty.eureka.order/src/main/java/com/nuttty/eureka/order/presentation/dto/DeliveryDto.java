@@ -1,9 +1,11 @@
 package com.nuttty.eureka.order.presentation.dto;
 
 import com.nuttty.eureka.order.domain.model.DeliveryStatus;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,5 +23,30 @@ public interface DeliveryDto {
         private String deliveryReceiver;
         private DeliveryStatus deliveryStatus;
         private List<UUID> deliveryRouteIds;
+
+        @QueryProjection
+        public DeliveryResponseDto(UUID deliveryId, UUID orderId, Long deliveryPersonId, UUID departureHubId, UUID arrivalHubId, String deliveryAddress, String deliveryReceiver, DeliveryStatus deliveryStatus, List<UUID> deliveryRouteIds) {
+            this.deliveryId = deliveryId;
+            this.orderId = orderId;
+            this.deliveryPersonId = deliveryPersonId;
+            this.departureHubId = departureHubId;
+            this.arrivalHubId = arrivalHubId;
+            this.deliveryAddress = deliveryAddress;
+            this.deliveryReceiver = deliveryReceiver;
+            this.deliveryStatus = deliveryStatus;
+            this.deliveryRouteIds = deliveryRouteIds;
+        }
+    }
+
+    @Getter
+    @Builder
+    class DeliverySaerch {
+        private LocalDateTime startDate;
+        private LocalDateTime endDate;
+        private UUID deliveryId;
+        private UUID orderId;
+        private UUID departureHubId;
+        private String deliveryAddress;
+        private DeliveryStatus deliveryStatus;
     }
 }

@@ -2,11 +2,9 @@ package com.nuttty.eureka.order.infrastructure.repository;
 
 import com.nuttty.eureka.order.application.fegin.CompanyClient;
 import com.nuttty.eureka.order.application.fegin.dto.CompanyInfoDto;
-import com.nuttty.eureka.order.domain.model.DeliveryRoute;
-import com.nuttty.eureka.order.domain.model.Order;
-import com.nuttty.eureka.order.domain.model.OrderStatus;
-import com.nuttty.eureka.order.domain.model.QOrder;
+import com.nuttty.eureka.order.domain.model.*;
 import com.nuttty.eureka.order.domain.repository.OrderRepositoryCustom;
+import com.nuttty.eureka.order.presentation.dto.DeliveryDto;
 import com.nuttty.eureka.order.presentation.dto.OrederDto.OrderSearchDto;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -25,6 +23,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static com.nuttty.eureka.order.domain.model.QDelivery.*;
+import static com.nuttty.eureka.order.domain.model.QDeliveryRoute.*;
 import static com.nuttty.eureka.order.domain.model.QOrder.*;
 import static com.nuttty.eureka.order.presentation.dto.OrderProductDto.*;
 import static com.nuttty.eureka.order.presentation.dto.OrederDto.*;
@@ -60,13 +60,67 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
                         order.isDelete.eq(false));
 
 
-            // 외부 서비스 호출 및 데이터 결합
+        // 외부 서비스 호출 및 데이터 결합
         List<OrderResponseDto> result = orders.stream()
                 .map(this::mapToOrderResponseDto)
                 .toList();
 
         return PageableExecutionUtils.getPage(result, pageable, count::fetchCount);
 }
+
+    @Override
+    public Page<DeliveryDto.DeliveryResponseDto> findOrdersByCondition(DeliveryDto.DeliverySaerch condition, Pageable pageable) {
+        // 배송 정보 조회 쿼리
+        List<Order> orders = queryFactory
+                .selectFrom(order)
+                .join(order.delivery, delivery)
+                .leftJoin(delivery.deliveryRoutes, deliveryRoute)
+                .where(
+                        deliveryIdEq(condition.getDeliveryId()),
+                        orderIdEq(condition.getOrderId()),
+                        departureHubIdEq(condition.getDepartureHubId()),
+                        deliveryAddressEq(condition.getDeliveryAddress()),
+                        deliveryStatusEq(condition.getDeliveryStatus()),
+                        createdAtDeliveryGoeAndLoe(condition.getStartDate(), condition.getEndDate()),
+                        order.isDelete.eq(false))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getSortOrder(pageable.getSort()))
+                .fetch();
+
+        // 카운트 쿼리 지연 로딩
+        JPAQuery<Order> count = queryFactory
+                .selectFrom(order)
+                .join(order.delivery, delivery)
+                .where(
+                        deliveryIdEq(condition.getDeliveryId()),
+                        orderIdEq(condition.getOrderId()),
+                        departureHubIdEq(condition.getDepartureHubId()),
+                        deliveryAddressEq(condition.getDeliveryAddress()),
+                        deliveryStatusEq(condition.getDeliveryStatus()),
+                        createdAtDeliveryGoeAndLoe(condition.getStartDate(), condition.getEndDate()),
+                        order.isDelete.eq(false));
+
+        // 결과 Dto로 변환
+        List<DeliveryDto.DeliveryResponseDto> list = orders.stream()
+                .map(order -> DeliveryDto.DeliveryResponseDto.builder()
+                        .deliveryId(order.getDelivery().getDeliveryId())
+                        .orderId(order.getOrderId())
+                        .deliveryPersonId(order.getDelivery().getDeliveryPersonId())
+                        .departureHubId(order.getDelivery().getDepartureHubId())
+                        .arrivalHubId(order.getDelivery().getArrivalHubId())
+                        .deliveryAddress(order.getDelivery().getDeliveryAddress())
+                        .deliveryReceiver(order.getDelivery().getDeliveryReceiver())
+                        .deliveryStatus(order.getDelivery().getDeliveryStatus())
+                        .deliveryRouteIds(order.getDelivery().getDeliveryRoutes().stream()
+                                .map(DeliveryRoute::getDeliveryRouteId)
+                                .toList())
+                        .build())
+                .toList();
+
+        return PageableExecutionUtils.getPage(list, pageable, count::fetchCount);
+    }
+
 
     // 정렬 조건
     private OrderSpecifier<?>[] getSortOrder(Sort sort) {
@@ -139,4 +193,25 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
     private BooleanExpression orderIdEq(UUID orderId) {
         return orderId != null ? order.orderId.eq(orderId) : null;
     }
+
+    private BooleanExpression deliveryIdEq(UUID deliveryId) {
+        return deliveryId != null ? order.delivery.deliveryId.eq(deliveryId) : null;
+    }
+
+    private BooleanExpression departureHubIdEq(UUID departureHubId) {
+        return departureHubId != null ? order.delivery.departureHubId.eq(departureHubId) : null;
+    }
+
+    private BooleanExpression deliveryAddressEq(String deliveryAddress) {
+        return StringUtils.hasText(deliveryAddress) ? order.delivery.deliveryAddress.eq(deliveryAddress) : null;
+    }
+
+    private BooleanExpression deliveryStatusEq(DeliveryStatus deliveryStatus) {
+        return deliveryStatus != null ? order.delivery.deliveryStatus.eq(deliveryStatus) : null;
+    }
+
+    private BooleanExpression createdAtDeliveryGoeAndLoe(LocalDateTime startDate, LocalDateTime endDate) {
+        return startDate != null && endDate != null ? delivery.createdAt.between(startDate, endDate) : null;
+    }
+
 }
