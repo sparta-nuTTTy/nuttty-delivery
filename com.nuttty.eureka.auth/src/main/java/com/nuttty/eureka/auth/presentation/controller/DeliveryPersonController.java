@@ -1,13 +1,18 @@
 package com.nuttty.eureka.auth.presentation.controller;
 
 import com.nuttty.eureka.auth.application.dto.DeliveryPersonInfoDto;
+import com.nuttty.eureka.auth.application.dto.DeliveryPersonSearchResponseDto;
 import com.nuttty.eureka.auth.application.service.DeliveryPersonService;
 import com.nuttty.eureka.auth.domain.model.UserRoleEnum;
 import com.nuttty.eureka.auth.presentation.request.DeliveryPersonCreateDto;
+import com.nuttty.eureka.auth.presentation.request.DeliveryPersonSearchRequestDto;
 import com.nuttty.eureka.auth.presentation.request.DeliveryPersonTypeUpdateRequestDto;
 import com.nuttty.eureka.auth.util.ResultResponse;
 import com.nuttty.eureka.auth.util.SuccessCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,6 +82,19 @@ public class DeliveryPersonController {
                 .data(deliveryPersonService.deleteDeliveryPerson(role, userId, email, deliveryPersonId))
                 .resultCode(SuccessCode.DELETE_SUCCESS.getStatus())
                 .resultMessage(SuccessCode.DELETE_SUCCESS.getMessage())
+                .build();
+    }
+
+    // 배송 담당자 전체 조회
+    @GetMapping("/search")
+    public ResultResponse<Page<DeliveryPersonSearchResponseDto>> searchDeliveryPerson(@RequestHeader("X-User-Role") String role,
+                                                                                      @PageableDefault Pageable pageable,
+                                                                                      DeliveryPersonSearchRequestDto searchRequestDto) {
+        validateUserRole(role);
+        return ResultResponse.<Page<DeliveryPersonSearchResponseDto>>builder()
+                .data(deliveryPersonService.searchDeliveryPerson(pageable, searchRequestDto))
+                .resultCode(SuccessCode.SELECT_SUCCESS.getStatus())
+                .resultMessage(SuccessCode.SELECT_SUCCESS.getMessage())
                 .build();
     }
 
