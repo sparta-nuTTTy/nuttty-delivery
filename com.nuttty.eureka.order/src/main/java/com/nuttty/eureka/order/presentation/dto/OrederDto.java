@@ -7,14 +7,13 @@ import com.nuttty.eureka.order.domain.model.OrderStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static com.nuttty.eureka.order.presentation.dto.OrderProductDto.*;
+import static com.nuttty.eureka.order.presentation.dto.OrderProductDto.OrderItem;
 
 public interface OrederDto {
     @Getter
@@ -29,9 +28,7 @@ public interface OrederDto {
     @Getter
     @Builder
     class OrderSearchDto {
-        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime startDate;
-        @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
         LocalDateTime endDate;
         UUID orderId;
         UUID supplierId;
