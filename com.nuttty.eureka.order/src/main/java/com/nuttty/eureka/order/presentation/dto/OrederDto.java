@@ -77,4 +77,10 @@ public interface OrederDto {
             this.deliveryRoutes = deliveryRoutes;
         }
     }
+
+    @Getter
+    @Builder
+    class OrderCancelResponseDto {
+        private UUID orderId;
+    }
 }

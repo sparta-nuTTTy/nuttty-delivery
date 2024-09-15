@@ -138,4 +138,9 @@ public class OrderService {
     public Page<OrderResponseDto> searchOrders(OrderSearchDto condition, Pageable pageable) {
         return orderDomainService.searchOrders(condition, pageable);
     }
+
+    @Transactional
+    public OrderCancelResponseDto cancelOrder(UUID orderId, String email) {
+        return orderDomainService.cancelOrder(orderId, email);
+    }
 }
