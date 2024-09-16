@@ -7,10 +7,13 @@ import com.nuttty.eureka.order.domain.service.OrderDomainService;
 import com.nuttty.eureka.order.application.fegin.CompanyClient;
 import com.nuttty.eureka.order.application.fegin.dto.CompanyInfoDto;
 import com.nuttty.eureka.order.application.fegin.dto.ProductInfoDto;
+import com.nuttty.eureka.order.exception.exceptionsdefined.ExternalServiceException;
+import com.nuttty.eureka.order.exception.exceptionsdefined.InsufficientStockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,20 +41,22 @@ public class OrderService {
         CompanyInfoDto supplierCompany = companyClient.getCompany(orderCreateDto.getSupplierId());
         CompanyInfoDto receiverCompany = companyClient.getCompany(orderCreateDto.getReceiverId());
 
+        if (supplierCompany == null || receiverCompany == null) {
+            throw new ExternalServiceException(HttpStatus.NOT_FOUND, "회사 정보를 찾을 수 없습니다.");
+        }
+
         // 외부 서비스 호출: Product 서비스에서 상품 정보 조회(재고 확인) 및 재고 차감, 재고가 없을 경우 트랜잭션 롤백 처리 필요(학습후 구현 예정)
         log.info("상품 정보 조회 및 재고 확인 시작 : productItems = {}", orderCreateDto.getProductItems());
         orderCreateDto.getProductItems().forEach(orderItem -> {
             ProductInfoDto product = companyClient.getProduct(orderItem.getProductId());
-            log.info("상품 정보 조회 완료 : product = {}", product);
-            log.info("상품 정보 조회 내용 : productId = {}, productName = {}, productQuantity = {}, productPrice = {}",
-                    product.getProductDto().getProductId(),
-                    product.getProductDto().getProductName(),
-                    product.getProductDto().getProductQuantity(),
-                    product.getProductDto().getProductPrice());
+            // 상품 가격 확인
+            if (!product.getProductDto().getProductPrice().equals(orderItem.getProductPrice())) {
+                throw new ExternalServiceException(HttpStatus.BAD_REQUEST, "상품 가격이 일치하지 않습니다. 상품 ID: " + product.getProductDto().getProductId());
+            }
 
             // 재고 확인
             if (product.getProductDto().getProductQuantity() < orderItem.getOrderAmount()) {
-                throw new RuntimeException("재고 부족");
+                throw new InsufficientStockException("재고가 부족합니다. 상품 ID: " + product.getProductDto().getProductId());
             }
 
             // 재고 차감
@@ -99,7 +104,10 @@ public class OrderService {
         log.info("회사 정보 조회 시작 : supplierId = {}, receiverId = {}", order.getSupplierId(), order.getReceiverId());
         CompanyInfoDto supplierCompany = companyClient.getCompany(order.getSupplierId());
         CompanyInfoDto receiverCompany = companyClient.getCompany(order.getReceiverId());
-        log.info("회사 정보 조회 완료 : supplierCompany = {}, receiverCompany = {}", supplierCompany, receiverCompany);
+
+        if (supplierCompany == null || receiverCompany == null) {
+            throw new ExternalServiceException(HttpStatus.NOT_FOUND, "회사 정보를 찾을 수 없습니다.");
+        }
 
         // 주문 상품 -> Dto 변환
         List<OrderItem> orderItems = order.getOrderProducts().stream()
