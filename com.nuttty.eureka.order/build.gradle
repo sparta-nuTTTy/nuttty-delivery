@@ -59,6 +59,10 @@ dependencies {
 
 	// Fegin Client(Patch method support)
 	implementation 'io.github.openfeign:feign-hc5'
+
+	// Springdoc OpenAPI
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
+
 }
 
 dependencyManagement {
