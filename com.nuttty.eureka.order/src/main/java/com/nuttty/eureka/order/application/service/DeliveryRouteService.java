@@ -2,6 +2,7 @@ package com.nuttty.eureka.order.application.service;
 
 import com.nuttty.eureka.order.domain.model.DeliveryRoute;
 import com.nuttty.eureka.order.domain.model.Order;
+import com.nuttty.eureka.order.exception.exceptionsdefined.OrderNotFoundException;
 import com.nuttty.eureka.order.infrastructure.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +24,13 @@ public class DeliveryRouteService {
         log.info("배송 경로 단건 조회 시작 | deliveryRouteId: {}", deliveryRouteId);
 
         Order order = orderRepository.findOrderByDeliveryRouteId(deliveryRouteId)
-                .orElseThrow(() -> new IllegalArgumentException("배송 경로가 존재하지 않습니다."));
+                .orElseThrow(() -> new OrderNotFoundException("배송 경로가 존재하지 않습니다."));
 
         // 배송 경로 필터링
         DeliveryRoute deliveryRoute = order.getDelivery().getDeliveryRoutes().stream()
                 .filter(route -> route.getDeliveryRouteId().equals(deliveryRouteId))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("배송 경로가 존재하지 않습니다."));
+                .orElseThrow(() -> new OrderNotFoundException("배송 경로가 존재하지 않습니다."));
 
         // DeliveryRouteDto 변환
         return DeliveryRouteResponseDto.builder()
