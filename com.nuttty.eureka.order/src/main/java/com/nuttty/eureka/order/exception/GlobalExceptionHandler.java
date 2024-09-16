@@ -1,6 +1,9 @@
 package com.nuttty.eureka.order.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.nuttty.eureka.order.exception.exceptionsdefined.ExternalServiceException;
+import com.nuttty.eureka.order.exception.exceptionsdefined.InsufficientStockException;
+import com.nuttty.eureka.order.exception.exceptionsdefined.OrderNotFoundException;
 import com.nuttty.eureka.order.presentation.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -159,6 +162,45 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    // InsufficientStockException 처리
+    @ExceptionHandler(InsufficientStockException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientStockException(InsufficientStockException ex, HttpServletRequest request) {
+        log.error("InsufficientStockException", ex);
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Insufficient Stock",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    // ExternalServiceException 처리
+    @ExceptionHandler(ExternalServiceException.class)
+    public ResponseEntity<ErrorResponse> handleExternalServiceException(ExternalServiceException ex, HttpServletRequest request) {
+        log.error("ExternalServiceException", ex);
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getStatus().value(),
+                "External Service Error",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(ex.getStatus()).body(errorResponse);
+    }
+
+    // OrderNotFoundException 처리
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleOrderNotFoundException(OrderNotFoundException ex, HttpServletRequest request) {
+        log.error("OrderNotFoundException", ex);
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.NOT_FOUND.value(),
+                "Order Not Found",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
     /**
      * General Exception 처리
      * @param ex Exception
@@ -176,7 +218,4 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
-
-
-
 }
