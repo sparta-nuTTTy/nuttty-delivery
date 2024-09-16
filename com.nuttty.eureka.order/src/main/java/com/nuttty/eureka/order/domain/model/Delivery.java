@@ -70,4 +70,9 @@ public class Delivery extends AuditEntity {
             deliveryRoutes.add(DeliveryRoute.create(this, hubRoute, orderIdx++));
         }
     }
+
+    // 배송 담당자 배정 및 변경
+    public void changeDeliveryPersonId(Long deliveryPersonId) {
+        this.deliveryPersonId = deliveryPersonId;
+    }
 }

@@ -2,8 +2,10 @@ package com.nuttty.eureka.order.presentation.dto;
 
 import com.nuttty.eureka.order.domain.model.DeliveryStatus;
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,6 +49,22 @@ public interface DeliveryDto {
         private UUID orderId;
         private UUID departureHubId;
         private String deliveryAddress;
+        private DeliveryStatus deliveryStatus;
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    class DeliveryUpdateRequestDto {
+        private Long deliveryPersonId;
+        private DeliveryStatus deliveryStatus;
+    }
+
+    @Getter
+    @Builder
+    class DeliveryUpdateResponseDto {
+        private UUID deliveryId;
+        private UUID orderId;
+        private Long deliveryPersonId;
         private DeliveryStatus deliveryStatus;
     }
 }

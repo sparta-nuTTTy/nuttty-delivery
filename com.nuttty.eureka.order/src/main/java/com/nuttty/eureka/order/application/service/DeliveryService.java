@@ -3,7 +3,6 @@ package com.nuttty.eureka.order.application.service;
 import com.nuttty.eureka.order.domain.model.DeliveryRoute;
 import com.nuttty.eureka.order.domain.model.Order;
 import com.nuttty.eureka.order.infrastructure.repository.OrderRepository;
-import com.nuttty.eureka.order.presentation.dto.DeliveryDto;
 import com.nuttty.eureka.order.presentation.dto.DeliveryDto.DeliveryResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+
+import static com.nuttty.eureka.order.presentation.dto.DeliveryDto.*;
 
 @Service
 @Slf4j(topic = "DeliveryService")
@@ -44,11 +45,33 @@ public class DeliveryService {
     }
 
     @Transactional(readOnly = true)
-    public Page<DeliveryResponseDto> getDeliveries(DeliveryDto.DeliverySaerch condition, Pageable pageable) {
+    public Page<DeliveryResponseDto> getDeliveries(DeliverySaerch condition, Pageable pageable) {
         log.info("배송 검색 및 페이징 조회 시작 | condition: {}, pageable: {}", condition, pageable);
 
-        Page<DeliveryResponseDto> deliveryResponseDtos = orderRepository.findOrdersByCondition(condition, pageable);
+        return orderRepository.findOrdersByCondition(condition, pageable);
+    }
 
-        return deliveryResponseDtos;
+    // 배송 수정
+    @Transactional
+    public DeliveryUpdateResponseDto updateDelivery(UUID deliveryId, DeliveryUpdateRequestDto deliveryUpdateRequestDto) {
+        log.info("배송 수정 시작 | deliveryId: {}, deliveryUpdateRequestDto: {}", deliveryId, deliveryUpdateRequestDto);
+
+        Order order = orderRepository.findOrderByDeliveryId(deliveryId)
+                .orElseThrow(() -> new IllegalArgumentException("배송이 존재하지 않습니다."));
+
+        if (deliveryUpdateRequestDto.getDeliveryStatus() != null) {
+            order.getDelivery().changeDeliveryStatus(deliveryUpdateRequestDto.getDeliveryStatus());
+        }
+
+        if (deliveryUpdateRequestDto.getDeliveryPersonId() != null) {
+            order.getDelivery().changeDeliveryPersonId(deliveryUpdateRequestDto.getDeliveryPersonId());
+        }
+
+        return DeliveryUpdateResponseDto.builder()
+                .deliveryId(order.getDelivery().getDeliveryId())
+                .orderId(order.getOrderId())
+                .deliveryPersonId(order.getDelivery().getDeliveryPersonId())
+                .deliveryStatus(order.getDelivery().getDeliveryStatus())
+                .build();
     }
 }
