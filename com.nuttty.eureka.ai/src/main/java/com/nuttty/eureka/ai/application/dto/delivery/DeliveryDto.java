@@ -15,6 +15,7 @@ public class DeliveryDto {
     private UUID deliveryId;
     private UUID departureHubId;
     private UUID arrivalHubId;
+    private Long deliveryPersonId;
 
     private String deliveryAddress;
     private String deliveryReceiver;

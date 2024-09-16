@@ -1,4 +1,4 @@
-package com.nuttty.eureka.ai.application.dto.deliveryperson;
+package com.nuttty.eureka.ai.application.dto.hub;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -9,29 +9,26 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class DeliveryPersonSearchDto {
-
-    @JsonProperty("delivery_person_id")
-    private Long deliveryPersonId;
-
-    @JsonProperty("user_id")
-    private Long userId;
+@NoArgsConstructor
+public class HubDto {
 
     @JsonProperty("hub_id")
     private UUID hubId;
 
-    @JsonProperty("delivery_person_type")
-    private String deliveryPersonType;
+    @JsonProperty("user_id")
+    private Long userId;
 
-    @JsonProperty("slack_id")
-    private String slackId;
+    private String name;
+    private String address;
+
+    private String latitude;
+    private String longitude;
 
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
-    @JsonProperty("create_by")
+    @JsonProperty("created_by")
     private String createdBy;
 
     @JsonProperty("updated_at")

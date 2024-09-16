@@ -13,4 +13,9 @@ public interface DeliveryPersonClient {
     DeliveryPersonRequestDto findAllCommonDeliveryPerson(@RequestParam("size") int size,
                                                          @RequestParam("type") String type,
                                                          @RequestHeader("X-User-Role") String role);
+
+    @GetMapping("/api/v1/delivery-people/search")
+    DeliveryPersonRequestDto findAllCompanyDeliveryPerson(@RequestParam("size") int size,
+                                                         @RequestParam("type") String type,
+                                                         @RequestHeader("X-User-Role") String role);
 }
