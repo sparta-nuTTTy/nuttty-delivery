@@ -2,6 +2,7 @@ package com.nuttty.eureka.ai.exception;
 
 import com.nuttty.eureka.ai.application.dto.ErrorResponse;
 import com.nuttty.eureka.ai.exception.exceptionsdefined.ClientException;
+import com.nuttty.eureka.ai.exception.exceptionsdefined.WeatherException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -130,5 +131,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 ex.getMessage(),
                 request.getRequestURI());
         return ResponseEntity.status(ex.getStatusCode()).body(errorResponse);
+    }
+
+    /**
+     * 날씨 예외 처리
+     * @param ex
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(WeatherException.class)
+    public ResponseEntity<ErrorResponse> handlerBadRequest(WeatherException ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Weather API Error",
+                ex.getMessage(),
+                request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

@@ -2,12 +2,12 @@ package com.nuttty.eureka.ai.application.service;
 
 import com.nuttty.eureka.ai.application.dto.ai.AiDto;
 import com.nuttty.eureka.ai.application.dto.ai.AiSearchRequestDto;
+import com.nuttty.eureka.ai.application.dto.combine.DeliveryWithWeatherDto;
+import com.nuttty.eureka.ai.application.dto.delivery.DeliveryDto;
 import com.nuttty.eureka.ai.application.dto.deliveryperson.DeliveryPersonSearchDto;
+import com.nuttty.eureka.ai.application.dto.hub.HubDto;
 import com.nuttty.eureka.ai.domain.model.Ai;
-import com.nuttty.eureka.ai.domain.service.DeliveryPersonService;
-import com.nuttty.eureka.ai.domain.service.GeminiApiService;
-import com.nuttty.eureka.ai.domain.service.HubMappingOrderService;
-import com.nuttty.eureka.ai.domain.service.SlackService;
+import com.nuttty.eureka.ai.domain.service.*;
 import com.nuttty.eureka.ai.infrastructure.repository.AiRepository;
 import com.nuttty.eureka.ai.presentation.response.AiResponseDto;
 import com.slack.api.methods.SlackApiException;
@@ -23,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -38,6 +36,9 @@ public class AiService {
     private final DeliveryPersonService deliveryPersonService;
     private final GeminiApiService geminiApiService;
     private final SlackService slackService;
+    private final DeliveryService deliveryService;
+    private final HubService hubService;
+    private final WeatherService weatherService;
 
     /**
      * Ai 단 건 조회 | 마스터, 허브관리자, 배송 담당자
@@ -87,7 +88,6 @@ public class AiService {
      */
     @Scheduled(cron = "0 0 8 * * *")
     @Transactional
-    // TODO 잼민이 처리시간 길어질 경우 Read Time OUT 인가 터짐. 안쓰는게 나을거 같기도 함. 나중에 물어볼 것
     // TODO 슬랙 메세지 저장 해야함
     public void sendOrderToHubTransferPersonViaSlack() throws IOException, SlackApiException, URISyntaxException {
 
@@ -103,8 +103,8 @@ public class AiService {
         // 공통 허브 배송 담당자 ID
         List<UUID> deliveryPersonIdList = new ArrayList<>();
         for (DeliveryPersonSearchDto deliveryPersonDto : findDeliveryPerson) {
-            slackIdList.add(deliveryPersonDto.getSlack_id());
-            deliveryPersonIdList.add(deliveryPersonDto.getHub_id());
+            slackIdList.add(deliveryPersonDto.getSlackId());
+            deliveryPersonIdList.add(deliveryPersonDto.getHubId());
         }
 
         // Gemini API 통해 허브 별 주문정보 메세지 요약 시키기
@@ -118,5 +118,59 @@ public class AiService {
             aiRepository.save(Ai.createAi(message, uuid));
         }
 
+    }
+
+    /**
+     * 허브 별 날씨 정보 배송 기사에게 전송
+     * 전일 오전 6시 ~ 금일 오전 5시 59분 59초 배송 정보
+     * @throws URISyntaxException
+     * @throws SlackApiException
+     * @throws IOException
+     */
+    @Scheduled(cron = "0 0 6 * * *")
+    @Transactional
+    public void sendWeather() throws URISyntaxException, SlackApiException, IOException {
+
+        // 출발 허브 별 배송 정보
+        log.info("출발 허브 별 배송 정보 start");
+        Map<UUID, List<DeliveryDto>> allDelivery = deliveryService.findAllDelivery();
+        log.info("출발 허브 별 배송 정보 end");
+
+        // 허브 ID 리스트
+        List<UUID> hubIdList = new ArrayList<>(allDelivery.keySet());
+
+        // 허브 리스트
+        log.info("허브 리스트 start");
+        List<HubDto> findHubList = hubService.findByHubId(hubIdList);
+        log.info("허브 리스트 end");
+
+        // 허브 위도, 경도 별 날씨 정보
+        log.info("허브 위도, 경도 별 날씨 정보 start");
+        Map<UUID, String> weather = weatherService.wheather(findHubList);
+        log.info("허브 위도, 경도 별 날씨 정보 end");
+
+        // 배송 정보와 날씨 정보를 합쳐서 새로운 맵 생성
+        Map<UUID, DeliveryWithWeatherDto> combinedMap = new HashMap<>();
+
+        for (Map.Entry<UUID, List<DeliveryDto>> entry : allDelivery.entrySet()) {
+            UUID hubId = entry.getKey();
+            List<DeliveryDto> deliveries = entry.getValue();
+
+            // 동일한 허브 ID의 날씨 정보가 있는 경우에만 합침
+            if (weather.containsKey(hubId)) {
+                String weatherInfo = weather.get(hubId);
+                combinedMap.put(hubId, new DeliveryWithWeatherDto(deliveries, weatherInfo));
+            }
+        }
+
+        // 업체 배송 담당자 slackId 키, 날씨 정보 value
+        log.info("업체 배송 담당자 slackId 키, 날씨 정보 value start");
+        Map<String, String> allDeliveryPerson = deliveryPersonService.findAllDeliveryPerson(combinedMap);
+        log.info("업체 배송 담당자 slackId 키, 날씨 정보 value end");
+
+        // 슬랙 메세지 보내기
+        log.info("슬랙 메세지 보내기 start");
+        slackService.sendMessageForMap(allDeliveryPerson);
+        log.info("슬랙 메세지 보내기 end");
     }
 }
