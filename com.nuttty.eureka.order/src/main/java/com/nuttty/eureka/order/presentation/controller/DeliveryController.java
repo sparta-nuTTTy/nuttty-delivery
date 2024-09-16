@@ -44,7 +44,19 @@ public class DeliveryController {
                 .build();
     }
 
-    // 배송 검색 및 페이징 조회
+    /**
+     * 배송 검색 및 페이징 조회
+     * @param condition 검색 조건 <br>
+     *                  - deliveryId: 배송 ID <br>
+     *                  - orderId: 주문 ID <br>
+     *                  - departureHubId: 출발지 허브 ID <br>
+     *                  - deliveryAddress: 배송 주소 <br>
+     *                  - deliveryStatus: 배송 상태 <br>
+     *                  - startDate: 검색 시작일 <br>
+     *                  - endDate: 검색 종료일 <br>
+     * @param pageable: 페이징 정보
+     * @return: 배송 검색 및 페이징 조회 응답 DTO
+     */
     @GetMapping
     public ResultResponse<Page<DeliveryResponseDto>> searchDeliveries(DeliverySaerch condition, Pageable pageable) {
         log.info("배송 검색 및 페이징 조회 시도 중 | condition: {}, pageable: {}", condition, pageable);
