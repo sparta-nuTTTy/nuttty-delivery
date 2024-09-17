@@ -16,8 +16,8 @@ public class HubDto {
     private int userId;
     private String name;
     private String address;
-    private String latitude;
-    private String longitude;
+    private Double latitude;
+    private Double longitude;
     @JsonProperty("created_at")
     private LocalDateTime created_at;
     @JsonProperty("updated_at")
