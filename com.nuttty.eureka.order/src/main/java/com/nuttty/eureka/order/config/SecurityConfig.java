@@ -1,4 +1,4 @@
-package com.nuttty.eureka.hub.config;
+package com.nuttty.eureka.order.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +35,7 @@ class CustomIPFilter extends UsernamePasswordAuthenticationFilter {
     private static final String LOCAL_IPv6 = "0:0:0:0:0:0:0:1";
 
     @Override
-    protected boolean requiresAuthentication(HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) {
+    protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
         String remoteAddr = request.getRemoteAddr();
         String forwardedPort = request.getHeader("X-Forwarded-Port");
 

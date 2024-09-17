@@ -4,44 +4,25 @@ server:
 spring:
   application:
     name: order-service
+  config:
+    import: "configserver:"
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+      uri: http://localhost:19091
+      name: order-service
+      profile: local
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      username: default
-      password: systempass
-
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/orders
-    username: delivery
-    password: delivery777
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        default_batch_fetch_size: 1000
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:19090/eureka/
-  instance:
-    hostname: localhost
 
-# springdoc-openapi-ui
-springdoc:
-  api-docs:
-    version: openapi_3_1
-    enabled: true
-    path: /v3/api-docs
-    # 게이트웨이 라우팅에서 prefix를 제거하지 않았다면 해당 설정을 추가
-  enable-spring-security: true
-  default-consumes-media-type: application/json
-  default-produces-media-type: application/json
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh
