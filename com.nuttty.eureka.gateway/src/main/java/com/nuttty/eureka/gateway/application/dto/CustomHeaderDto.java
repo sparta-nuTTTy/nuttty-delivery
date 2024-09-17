@@ -7,7 +7,6 @@ import lombok.Getter;
 @Builder
 public class CustomHeaderDto {
     private String token;
-    private Long userId;
+    private String userId;
     private String role;
-    private String email;
 }

@@ -9,7 +9,6 @@ import com.nuttty.eureka.auth.util.ResultResponse;
 import com.nuttty.eureka.auth.util.SuccessCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -39,14 +38,5 @@ public class AuthController {
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMessage(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
-    }
-
-    // userId 존재여부 검증 API
-    @GetMapping("/verify")
-    public ResponseEntity<Boolean> verifyUser(final @RequestParam(value = "user_id") Long userId) {
-        UserInfoDto userInfo = authService.verifyUser(userId);
-        Boolean response = (userInfo != null); // 유저가 존재하면 true, 존재하지 않으면 false
-
-        return ResponseEntity.ok(response);
     }
 }

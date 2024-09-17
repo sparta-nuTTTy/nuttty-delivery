@@ -1,6 +1,7 @@
 package com.nuttty.eureka.order.domain.service;
 
 import com.nuttty.eureka.order.domain.model.*;
+import com.nuttty.eureka.order.exception.exceptionsdefined.OrderNotFoundException;
 import com.nuttty.eureka.order.presentation.dto.OrederDto;
 import com.nuttty.eureka.order.presentation.dto.OrederDto.OrderCreateDto;
 import com.nuttty.eureka.order.infrastructure.repository.OrderRepository;
@@ -71,7 +72,7 @@ public class OrderDomainService {
     @Transactional(readOnly = true)
     public Order getOrder(UUID orderId) {
         return orderRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId = " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException("주문이 존재하지 않습니다. orderId = " + orderId));
     }
 
     // 주문 동적 검색 및 페이징 조회
@@ -84,7 +85,7 @@ public class OrderDomainService {
     @Transactional
     public OrederDto.OrderCancelResponseDto cancelOrder(UUID orderId, String email) {
         Order order = orderRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId = " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException("주문이 존재하지 않습니다. orderId = " + orderId));
 
         // 더티 체킹을 이용한 주문 소프트 삭제
         order.soft(email);
@@ -98,7 +99,7 @@ public class OrderDomainService {
     @Transactional
     public OrederDto.OrderUpdateResponseDto updateOrder(UUID orderId, OrederDto.OrderUpdateDto orderUpdateDto) {
         Order order = orderRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다. orderId = " + orderId));
+                .orElseThrow(() -> new OrderNotFoundException("주문이 존재하지 않습니다. orderId = " + orderId));
 
         // 주문 상태 변경
         order.updateOrderStatus(orderUpdateDto.getOrderStatus());

@@ -46,3 +46,23 @@ jwt:
   access-expiration: 3600000
   secret-key: "7Iqk7YyM66W07YOA7L2U65Sp7YG065-9U3ByaW5n6rCV7J2Y7Yqc7YSw7LWc7JuQ67mI7J6F64uI64ukLg=="
   admin-token: AIzaSyBZFANrsha1UH5CaSDUxtfdXaTQ5yOtPhE
+
+springdoc:
+  swagger-ui:
+    use-root-path: true
+    urls[0]:
+      name: Auth Service
+      url: http://localhost:19093/v3/api-docs
+    urls[1]:
+      name: Order Service
+      url: http://localhost:19094/v3/api-docs
+    urls[2]:
+      name: Company Service
+      url: http://localhost:19095/v3/api-docs
+    urls[3]:
+      name: Hub Service
+      url: http://localhost:19096/v3/api-docs
+    urls[4]:
+      name: AI Service
+      url: http://localhost:19097/v3/api-docs
+
