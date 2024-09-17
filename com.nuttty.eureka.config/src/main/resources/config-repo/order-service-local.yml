@@ -1,9 +1,9 @@
 server:
-  port: 19097
+  port: 19094
 
 spring:
   application:
-    name: ai-service
+    name: order-service
 
   data:
     redis:
@@ -14,7 +14,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/ai
+    url: jdbc:postgresql://localhost:5432/orders
     username: delivery
     password: delivery777
 
@@ -27,11 +27,6 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_batch_fetch_size: 1000
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: never
 
 eureka:
   client:
@@ -39,9 +34,6 @@ eureka:
       defaultZone: http://localhost:19090/eureka/
   instance:
     hostname: localhost
-
-slack:
-  botKey: ${SLACK_API_TOKEN}
 
 # springdoc-openapi-ui
 springdoc:

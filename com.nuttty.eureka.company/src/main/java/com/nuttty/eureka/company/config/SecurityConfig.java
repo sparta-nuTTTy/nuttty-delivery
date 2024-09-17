@@ -1,6 +1,7 @@
 package com.nuttty.eureka.company.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,6 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
@@ -36,11 +39,16 @@ class CustomIPFilter extends UsernamePasswordAuthenticationFilter {
         String remoteAddr = request.getRemoteAddr();
         String forwardedPort = request.getHeader("X-Forwarded-Port");
 
-        // 로컬호스트와 게이트웨이 IP에서만 접근을 허용
         if ((LOCAL_IPv4.equals(remoteAddr) || LOCAL_IPv6.equals(remoteAddr)) && GATEWAY_PORT.equals(forwardedPort)) {
             return false; // 허용된 IP
         } else {
-            return true; // 차단된 IP
+            try {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return false; // 차단된 IP
         }
     }
 }
+

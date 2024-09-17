@@ -30,7 +30,7 @@ public class ActuatorRefreshController {
                 "http://localhost:19097/actuator/refresh", // ai-service
                 "http://localhost:19095/actuator/refresh", // company-service
                 "http://localhost:19096/actuator/refresh", // hub-service
-
+                "http://localhost:19094/actuator/refresh", // order-service
         };
 
         for (String serviceUrl : services) {
