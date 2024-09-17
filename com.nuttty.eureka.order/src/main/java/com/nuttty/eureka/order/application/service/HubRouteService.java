@@ -23,7 +23,7 @@ public class HubRouteService {
     @Transactional
     public void createAllHubRoutes() {
         // 허브 목록 조회
-        List<ContentDto> content = hubClient.getAllHubs().getContent();
+        List<ContentDto> content = hubClient.getAllHubs("19092").getContent();
         List<HubDto> hubDtos = content.get(0).getHubDto();
         log.info("허브 목록 조회 | size: {}", hubDtos.size());
 
