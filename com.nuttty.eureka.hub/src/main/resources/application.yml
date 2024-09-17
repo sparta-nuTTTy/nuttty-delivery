@@ -43,9 +43,15 @@ spring:
 #    init:
 #      mode: never
 #
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://localhost:19090/eureka/
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
 
 message: "default"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh

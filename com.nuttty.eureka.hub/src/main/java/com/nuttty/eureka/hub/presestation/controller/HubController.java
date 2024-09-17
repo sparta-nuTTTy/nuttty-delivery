@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -28,6 +29,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/v1")
+@RefreshScope
 public class HubController {
 
     private final HubService hubService;
