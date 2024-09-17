@@ -35,4 +35,4 @@ eureka:
     service-url:
       defaultZone: http://localhost:19090/eureka/
 
-message: "Hello World!!!"
+message: "Hello World update"
