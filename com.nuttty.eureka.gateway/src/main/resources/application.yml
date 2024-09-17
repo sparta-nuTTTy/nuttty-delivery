@@ -29,10 +29,6 @@ spring:
           uri: lb://ai-service
           predicates:
             - Path=/api/v1/ai/**
-        - id: refresh-all-services
-          uri: lb://{serviceId}/actuator/refresh
-          predicates:
-            - Path=/actuator/refresh
       discovery:
         locator:
           enabled: true
@@ -49,7 +45,7 @@ jwt:
 
 springdoc:
   swagger-ui:
-    use-root-path: true
+    path: /swagger
     urls[0]:
       name: Auth Service
       url: http://localhost:19093/v3/api-docs
