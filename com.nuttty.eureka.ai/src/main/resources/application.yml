@@ -15,34 +15,6 @@ spring:
       name: ai-service
       profile: local
 
-#  data:
-#    redis:
-#      host: localhost
-#      port: 6379
-#      username: default
-#      password: systempass
-#
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://localhost:5432/ai
-#    username: delivery
-#    password: delivery777
-#
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#    properties:
-#      hibernate:
-#        show_sql: true
-#        format_sql: true
-#        dialect: org.hibernate.dialect.PostgreSQLDialect
-#        default_batch_fetch_size: 1000
-#    defer-datasource-initialization: true
-#
-#  sql:
-#    init:
-#      mode: never
-
 eureka:
   client:
     service-url:
@@ -53,5 +25,3 @@ management:
     web:
       exposure:
         include: refresh
-
-message: "default"

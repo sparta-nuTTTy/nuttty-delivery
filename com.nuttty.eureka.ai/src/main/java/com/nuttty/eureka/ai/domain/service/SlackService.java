@@ -7,6 +7,7 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 @Component
 @Slf4j
 @Transactional(readOnly = true)
+@RefreshScope
 public class SlackService {
 
     @Value("${slack.botKey}")

@@ -5,7 +5,6 @@ import com.nuttty.eureka.ai.application.service.AiService;
 import com.nuttty.eureka.ai.presentation.response.AiResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -114,13 +113,5 @@ public class AiController {
         } else {
             return true;
         }
-    }
-
-    @Value("${message}")
-    private String message;
-
-    @GetMapping("/ai/message")
-    public String getMessage() {
-        return message;
     }
 }
