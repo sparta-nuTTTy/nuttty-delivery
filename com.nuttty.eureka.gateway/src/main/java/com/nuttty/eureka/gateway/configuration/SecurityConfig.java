@@ -38,8 +38,12 @@ public class SecurityConfig {
         return (exchange, chain) -> {
 
             String path = exchange.getRequest().getURI().getPath();
-            if (path.startsWith("/api/v1/auth")) { // auth 관련 요청은 토큰 x >> 검증 x
-                log.info("/api/v1/auth 요청 #####");
+            System.out.println(path);
+            if (path.startsWith("/api/v1/auth") ||
+                    path.startsWith("/swagger") ||
+                    path.startsWith("/v3/api-docs/swagger-config") ||
+                    path.startsWith("/webjars")) { // auth 관련 요청은 토큰 x >> 검증 x
+                log.info("{} 요청 #####", path);
                 return chain.filter(exchange);
             }
 
