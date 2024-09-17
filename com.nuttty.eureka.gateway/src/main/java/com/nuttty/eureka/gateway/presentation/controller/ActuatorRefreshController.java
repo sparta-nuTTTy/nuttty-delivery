@@ -1,5 +1,8 @@
 package com.nuttty.eureka.gateway.presentation.controller;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +20,11 @@ public class ActuatorRefreshController {
 
     @PostMapping("/refresh")
     public void refreshAllServices() {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("X-Forwarded-Port", "19092");
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
         // 각 서비스의 /actuator/refresh 엔드포인트 호출
         String[] services = {
                 "http://localhost:19097/actuator/refresh", // ai-service
@@ -26,7 +34,7 @@ public class ActuatorRefreshController {
         };
 
         for (String serviceUrl : services) {
-            restTemplate.postForObject(serviceUrl, null, String.class);
+            restTemplate.exchange(serviceUrl, HttpMethod.POST, entity, String.class);
         }
     }
 }
