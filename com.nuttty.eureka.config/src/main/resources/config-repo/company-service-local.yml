@@ -39,3 +39,5 @@ eureka:
       defaultZone: http://localhost:19090/eureka/
   instance:
     hostname: localhost
+
+message: "company-service"

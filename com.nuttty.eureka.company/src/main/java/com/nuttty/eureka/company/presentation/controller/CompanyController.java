@@ -10,6 +10,7 @@ import com.nuttty.eureka.company.presentation.response.CompanySearchResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -159,5 +160,11 @@ public class CompanyController {
         }
     }
     
-    
+    @Value("${message}")
+    private String message;
+
+    @GetMapping("/companies/message")
+    public String message() {
+        return message;
+    }
 }

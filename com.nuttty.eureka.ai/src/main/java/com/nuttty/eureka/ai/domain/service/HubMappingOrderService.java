@@ -32,8 +32,8 @@ public class HubMappingOrderService {
     public String getOrder() {
 
         // 전일 오전 8시에서 현재 오전 7시 59분
-        LocalDateTime startTime = LocalDateTime.now().minusDays(2).withHour(8).withMinute(0).withSecond(0);
-        LocalDateTime endTime = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
+        LocalDateTime startTime = LocalDateTime.now().minusDays(1).withHour(8).withMinute(0).withSecond(0);
+        LocalDateTime endTime = LocalDateTime.now().withHour(7).withMinute(59).withSecond(59);
 
         // 전일 오전 8시에서 현재 오전 7시 59분 주문 10만 건 조회
         OrderRequestDto findAllOrder = null;
