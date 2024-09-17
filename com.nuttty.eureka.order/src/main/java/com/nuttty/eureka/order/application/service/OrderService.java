@@ -38,8 +38,8 @@ public class OrderService {
     public OrderCreateResponseDto createOrder(OrderCreateDto orderCreateDto) {
         // 외부 서비스 호출: Company 서비스에서 회사 정보 조회
         log.info("회사 정보 조회 시작 : supplierId = {}, receiverId = {}", orderCreateDto.getSupplierId(), orderCreateDto.getReceiverId());
-        CompanyInfoDto supplierCompany = companyClient.getCompany(orderCreateDto.getSupplierId());
-        CompanyInfoDto receiverCompany = companyClient.getCompany(orderCreateDto.getReceiverId());
+        CompanyInfoDto supplierCompany = companyClient.getCompany(orderCreateDto.getSupplierId(), "19092");
+        CompanyInfoDto receiverCompany = companyClient.getCompany(orderCreateDto.getReceiverId(), "19092");
 
         if (supplierCompany == null || receiverCompany == null) {
             throw new ExternalServiceException(HttpStatus.NOT_FOUND, "회사 정보를 찾을 수 없습니다.");
@@ -48,7 +48,7 @@ public class OrderService {
         // 외부 서비스 호출: Product 서비스에서 상품 정보 조회(재고 확인) 및 재고 차감, 재고가 없을 경우 트랜잭션 롤백 처리 필요(학습후 구현 예정)
         log.info("상품 정보 조회 및 재고 확인 시작 : productItems = {}", orderCreateDto.getProductItems());
         orderCreateDto.getProductItems().forEach(orderItem -> {
-            ProductInfoDto product = companyClient.getProduct(orderItem.getProductId());
+            ProductInfoDto product = companyClient.getProduct(orderItem.getProductId(), "19092");
             // 상품 가격 확인
             if (!product.getProductDto().getProductPrice().equals(orderItem.getProductPrice())) {
                 throw new ExternalServiceException(HttpStatus.BAD_REQUEST, "상품 가격이 일치하지 않습니다. 상품 ID: " + product.getProductDto().getProductId());
@@ -60,7 +60,7 @@ public class OrderService {
             }
 
             // 재고 차감
-            Integer decreaseStock = companyClient.decreaseStock(orderItem.getProductId(), orderItem.getOrderAmount());
+            Integer decreaseStock = companyClient.decreaseStock(orderItem.getProductId(), orderItem.getOrderAmount(), "19092");
             log.info("상품 재고 차감 완료 : productId = {}, orderAmount = {}", orderItem.getProductId(), orderItem.getOrderAmount());
             log.info("상품 재고 차감 내용 : decreaseStock = {}", decreaseStock);
         });
@@ -102,8 +102,8 @@ public class OrderService {
 
         // 외부 서비스 호출: Company 서비스에서 회사 정보 조회
         log.info("회사 정보 조회 시작 : supplierId = {}, receiverId = {}", order.getSupplierId(), order.getReceiverId());
-        CompanyInfoDto supplierCompany = companyClient.getCompany(order.getSupplierId());
-        CompanyInfoDto receiverCompany = companyClient.getCompany(order.getReceiverId());
+        CompanyInfoDto supplierCompany = companyClient.getCompany(order.getSupplierId(), "19092");
+        CompanyInfoDto receiverCompany = companyClient.getCompany(order.getReceiverId(), "19092");
 
         if (supplierCompany == null || receiverCompany == null) {
             throw new ExternalServiceException(HttpStatus.NOT_FOUND, "회사 정보를 찾을 수 없습니다.");

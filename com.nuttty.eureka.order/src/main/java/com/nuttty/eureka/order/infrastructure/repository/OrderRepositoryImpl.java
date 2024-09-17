@@ -144,8 +144,8 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
 
     private OrderResponseDto mapToOrderResponseDto(Order order) {
         // 회사 정보 조회
-        CompanyInfoDto supplierCompany = companyClient.getCompany(order.getSupplierId());
-        CompanyInfoDto receiverCompany = companyClient.getCompany(order.getReceiverId());
+        CompanyInfoDto supplierCompany = companyClient.getCompany(order.getSupplierId(), "19092");
+        CompanyInfoDto receiverCompany = companyClient.getCompany(order.getReceiverId(), "19092");
 
         // OrderProduct를 OrderItem으로 변환
         List<OrderItem> orderItems = order.getOrderProducts().stream()

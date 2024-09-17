@@ -38,7 +38,7 @@ public class HubMappingOrderService {
         // 전일 오전 8시에서 현재 오전 7시 59분 주문 10만 건 조회
         OrderRequestDto findAllOrder = null;
         try {
-            findAllOrder = orderClient.findAllOrder(startTime, endTime, 100000);
+            findAllOrder = orderClient.findAllOrder(startTime, endTime, 100000, "19092");
 
         } catch (FeignException e) {
             int statusCode = e.status();
@@ -77,7 +77,7 @@ public class HubMappingOrderService {
         // 공급업체 키 값으로 업체 전체 조회
         List<CompanyDto> findAllCompany = null;
         try {
-            findAllCompany = companyClient.findAllSupplierId(supplierKeyList);
+            findAllCompany = companyClient.findAllSupplierId(supplierKeyList, "19092");
 
         }catch (FeignException e) {
             int statusCode = e.status();
