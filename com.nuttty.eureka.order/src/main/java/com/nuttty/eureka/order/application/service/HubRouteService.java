@@ -2,7 +2,9 @@ package com.nuttty.eureka.order.application.service;
 
 import com.nuttty.eureka.order.application.fegin.HubClient;
 import com.nuttty.eureka.order.application.fegin.dto.ContentDto;
+import com.nuttty.eureka.order.application.fegin.dto.DirectionsResponse;
 import com.nuttty.eureka.order.application.fegin.dto.HubDto;
+import com.nuttty.eureka.order.application.fegin.dto.WayPoint;
 import com.nuttty.eureka.order.domain.model.HubRoute;
 import com.nuttty.eureka.order.infrastructure.repository.HubRouteRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.*;
 public class HubRouteService {
     private final HubClient hubClient;
     private final HubRouteRepository hubRouteRepository;
+    private final NaverDirectionService naverDirectionService;
 
     @Transactional
     public void createAllHubRoutes() {
@@ -41,14 +44,25 @@ public class HubRouteService {
     }
 
     private void createHubRoute(HubDto departureHub, HubDto arrivalHub) {
+        // Direction 5 API 호출하여 소요시간 및 거리 계산
+        DirectionsResponse directions = naverDirectionService.getDirecitons(Arrays.asList(
+                new WayPoint(departureHub.getLongitude(), departureHub.getLatitude()),
+                new WayPoint(arrivalHub.getLongitude(), arrivalHub.getLatitude())
+        ));
+
+        // 소요 시간 및 거리 정보 추출
+        Double distanceInKilometers = directions.getRoute().getTraoptimal().get(0).getSummary().getDistance();
+        Double durationInSeconds = directions.getRoute().getTraoptimal().get(0).getSummary().getDuration();
+
         // 허브 간 경로 생성
-        String routeInfo  = departureHub.getName() + " -> " + arrivalHub.getName();
+        String routeInfo = departureHub.getName() + " -> " + arrivalHub.getName();
 
         log.info("출발 허브 ID: {}, 도착 허브 ID: {}, 경로 정보: {}", departureHub.getHubId(), arrivalHub.getHubId(), routeInfo);
         HubRoute hubRoute = HubRoute.create(
                 departureHub.getHubId(),
                 arrivalHub.getHubId(),
-                LocalDateTime.now(), // 추후 네이버 Map API 중 Directions 5 API 연동하여 시간 계산
+                durationInSeconds,
+                distanceInKilometers,
                 routeInfo
         );
 
