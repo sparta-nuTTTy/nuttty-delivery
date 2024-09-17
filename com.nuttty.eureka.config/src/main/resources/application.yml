@@ -2,17 +2,22 @@ server:
   port: 19091
 
 spring:
-  profiles:
-    active: native
   application:
     name: config-server
   cloud:
     config:
       server:
-        native:
-          search-locations: classpath:/config-repo  # 리소스 폴더의 디렉토리 경로
+        git:
+          uri: https://github.com/sparta-nuTTTy/nuttty-delivery # 설정 파일이 저장된 Git 저장소의 URL
+          default-label: dev  # Git 브랜치 (기본적으로 main 사용)
+          search-paths: com.nuttty.eureka.config/src/main/resources/config-repo/ # Git 저장소의 루트 경로에서 설정 파일을 찾는 경로를 지정하는 옵션
+          clone-on-start: true  # Config Server가 시작될 때 Git 저장소를 클론 (옵션)
+      fail-fast: true  # Config Server가 실패할 경우 빠르게 실패 처리를 합니다.
 
 
+# 애플리케이션이 로컬에서 실행 중일 때는 이 옵션을 활성화할 수 있습니다.
+# spring.profiles.active: native
+# spring.cloud.config.server.native.searchLocations: classpath:/config-repo
 
 eureka:
   client:

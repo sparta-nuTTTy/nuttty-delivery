@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: hub-service-local
+
+server:
+  port: 9999
+
+message: "Hello World"
