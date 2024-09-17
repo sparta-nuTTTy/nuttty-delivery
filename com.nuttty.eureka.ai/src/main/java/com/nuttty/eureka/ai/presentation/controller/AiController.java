@@ -3,8 +3,10 @@ package com.nuttty.eureka.ai.presentation.controller;
 import com.nuttty.eureka.ai.application.dto.ai.AiSearchRequestDto;
 import com.nuttty.eureka.ai.application.service.AiService;
 import com.nuttty.eureka.ai.presentation.response.AiResponseDto;
+import com.slack.api.methods.SlackApiException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 @Slf4j
@@ -113,5 +117,18 @@ public class AiController {
         } else {
             return true;
         }
+    }
+
+    @GetMapping("/ai/slack")
+    public void slack() throws SlackApiException, IOException, URISyntaxException {
+        aiService.sendOrderToHubTransferPersonViaSlack();
+    }
+
+    @Value("${message}")
+    private String message;
+
+    @GetMapping("/ai/message")
+    public String message() {
+        return message;
     }
 }

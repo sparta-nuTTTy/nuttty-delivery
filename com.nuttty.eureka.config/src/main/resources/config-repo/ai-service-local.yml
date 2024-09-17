@@ -42,3 +42,5 @@ eureka:
 
 slack:
   botKey: ${SLACK_API_TOKEN}
+
+message: "ai-service"
