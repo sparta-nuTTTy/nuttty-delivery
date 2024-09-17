@@ -9,7 +9,7 @@ spring:
       server:
         git:
           uri: https://github.com/sparta-nuTTTy/nuttty-delivery # 설정 파일이 저장된 Git 저장소의 URL
-          default-label: dev  # Git 브랜치 (기본적으로 main 사용)
+          default-label: feature/98-config  # Git 브랜치 (기본적으로 main 사용)
           search-paths: com.nuttty.eureka.config/src/main/resources/config-repo/ # Git 저장소의 루트 경로에서 설정 파일을 찾는 경로를 지정하는 옵션
           clone-on-start: true  # Config Server가 시작될 때 Git 저장소를 클론 (옵션)
       fail-fast: true  # Config Server가 실패할 경우 빠르게 실패 처리를 합니다.
