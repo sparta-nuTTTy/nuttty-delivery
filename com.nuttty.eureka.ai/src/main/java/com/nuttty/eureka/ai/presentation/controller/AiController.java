@@ -5,6 +5,8 @@ import com.nuttty.eureka.ai.application.service.AiService;
 import com.nuttty.eureka.ai.presentation.response.AiResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -18,12 +20,14 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@RefreshScope
 public class AiController {
 
     private final AiService aiService;
 
     /**
      * Ai 단 건 조회 | 마스터, 허브관리자, 배송 담당자
+     *
      * @param aiId
      * @return
      */
@@ -41,6 +45,7 @@ public class AiController {
 
     /**
      * ai 페이징 전체 조회 | 마스터, 허브관리자, 배송 담당자
+     *
      * @param role
      * @param condition
      * @param pageable
@@ -61,6 +66,7 @@ public class AiController {
 
     /**
      * ai 삭제 | 마스터 허용
+     *
      * @param aiId
      * @param role
      * @param email
@@ -82,13 +88,14 @@ public class AiController {
 
     /**
      * 마스터 검증
+     *
      * @param role
      * @return
      */
     private boolean validateMaster(String role) {
         if (role.equals("MASTER")) {
             return true;
-        }else {
+        } else {
             log.error("마스터만 접근 가능합니다.");
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "마스터만 접근 가능합니다.");
         }
@@ -96,6 +103,7 @@ public class AiController {
 
     /**
      * 허브 업체 제외 검증
+     *
      * @param role
      * @return
      */
@@ -103,8 +111,16 @@ public class AiController {
         if (role.equals("HUB_COMPANY")) {
             log.error("허브 업체는 접근 불가능 합니다.");
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "허브 업체는 접근 불가능 합니다.");
-        }else {
+        } else {
             return true;
         }
+    }
+
+    @Value("${message}")
+    private String message;
+
+    @GetMapping("/ai/message")
+    public String getMessage() {
+        return message;
     }
 }
