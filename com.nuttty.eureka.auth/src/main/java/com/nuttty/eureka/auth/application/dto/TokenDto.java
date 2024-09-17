@@ -7,11 +7,10 @@ import lombok.*;
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
 public class TokenDto {
-    private static final String BEARER_PREFIX = "Bearer ";
     private String accessToken;
 
     public static TokenDto of(String accessToken) {
-        return TokenDto.builder().accessToken(BEARER_PREFIX + accessToken).build();
+        return TokenDto.builder().accessToken(accessToken).build();
     }
 
     @Override

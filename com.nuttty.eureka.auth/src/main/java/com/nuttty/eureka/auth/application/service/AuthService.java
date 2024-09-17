@@ -5,47 +5,40 @@ import com.nuttty.eureka.auth.application.dto.UserInfoDto;
 import com.nuttty.eureka.auth.domain.model.User;
 import com.nuttty.eureka.auth.domain.model.UserRoleEnum;
 import com.nuttty.eureka.auth.exception.custom.InvalidAdminPasswordException;
+import com.nuttty.eureka.auth.application.jwt.JwtUtil;
 import com.nuttty.eureka.auth.infrastructure.repository.UserRepository;
 import com.nuttty.eureka.auth.presentation.request.LoginRequestDto;
 import com.nuttty.eureka.auth.presentation.request.SignupRequestDto;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
-
 @Service
+@Slf4j(topic = "AuthService")
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final SecretKey secretKey;
+    private final JwtUtil jwtUtil;
     private final RedisTemplate<String, Object> redisTemplate;
-
-    @Value("${spring.application.name}")
-    private String issuer;
 
     @Value("${jwt.admin-token}")
     private String ADMIN_TOKEN;
 
-    @Value(("${jwt.access-expiration}"))
-    private Long accessExpiration;
-
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, @Value("${jwt.secret-key}") String secretKey,
-                       RedisTemplate<String, Object> redisTemplate) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil, RedisTemplate<String, Object> redisTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
+        this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
     }
 
@@ -80,45 +73,22 @@ public class AuthService {
         // 가입 여부 확인
         User user = userRepository.findByEmail(loginRequestDto.getEmail())
                 .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 유저입니다."));
+        log.info("가입 여부 확인 완료 #####");
 
         // 비밀번호 일치 확인
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
+        log.info("비밀번호 일치여부 확인 완료 #####");
+
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        // Security 인증 검사
+        Authentication authentication = jwtUtil.createAuthentication(user.getUserId().toString(), loginRequestDto.getPassword());
+        context.setAuthentication(authentication);
+        log.info("컨텍스트 홀더 저장 완료 #####");
 
         // 토큰 생성
-        return createAccessToken(loginRequestDto.getEmail());
-    }
-
-
-    // 토큰 생성
-    private TokenDto createAccessToken(String email) {
-        // 이메일로 가입한 유저 존재 여부 검사
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 유저입니다."));
-
-        // 토큰 반환
-        return userRepository.findByEmail(user.getEmail())
-                // user_id & role 로 JWT 토큰을 생성
-                .map(userInfo -> TokenDto.of(Jwts.builder()
-                                .claim("user_id", userInfo.getUserId())
-                                .claim("role", userInfo.getRole())
-                                .claim("email", userInfo.getEmail())
-                                .issuer(issuer)
-                                .issuedAt(new Date(System.currentTimeMillis()))
-                                .expiration(new Date(System.currentTimeMillis() + accessExpiration))
-                                .signWith(secretKey)
-                                .compact())
-                        //유저가 존재하지 않는다면 Exception 을 발생 시킵니다.
-                ).orElseThrow(() -> new EntityNotFoundException("Reject createAccessToken: 존재하지 않는 유저입니다."));
-    }
-
-
-    // userId 존재여부 검증 API
-    @Cacheable(cacheNames = "userInfoCache", key = "#userId")
-    public UserInfoDto verifyUser(Long userId) {
-        return userRepository.findById(userId)
-                .map(UserInfoDto::of) // User가 존재하면 UserInfoDto로 변환
-                .orElse(null); // 없으면 null 반환
+        log.info("토큰 생성 시작 #####");
+        return jwtUtil.createAccessToken(user.getUserId(), user.getRole());
     }
 }

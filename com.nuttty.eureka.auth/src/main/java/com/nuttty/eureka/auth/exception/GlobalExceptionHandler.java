@@ -3,9 +3,11 @@ package com.nuttty.eureka.auth.exception;
 import com.nuttty.eureka.auth.application.dto.ErrorResponse;
 import com.nuttty.eureka.auth.exception.custom.DeliveryPersonAlreadyExistsException;
 import com.nuttty.eureka.auth.exception.custom.InvalidAdminPasswordException;
+import com.nuttty.eureka.auth.exception.custom.AlreadyIsDeletedException;
 import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -90,9 +93,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .collect(Collectors.groupingBy(
-                        fieldError -> fieldError.getField(),
+                        FieldError::getField,
                         Collectors.mapping(
-                                fieldError -> fieldError.getDefaultMessage(),
+                                DefaultMessageSourceResolvable::getDefaultMessage,
                                 Collectors.joining(", ") // 메시지를 ','로 구분하여 하나로 합침
                         )
                 ));
@@ -128,5 +131,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 request.getRequestURI());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    // 이미 삭제된 정보 삭제 시도 시 예외 - 409 Conflicts
+    @ExceptionHandler(AlreadyIsDeletedException.class)
+    public ResponseEntity<ErrorResponse> handleUserIsAlreadyDeleted(AlreadyIsDeletedException ex, HttpServletRequest request){
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Conflict",
+                ex.getMessage(),
+                request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 }

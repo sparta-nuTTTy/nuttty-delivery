@@ -4,6 +4,7 @@ import com.nuttty.eureka.auth.application.dto.UserInfoDto;
 import com.nuttty.eureka.auth.application.dto.UserSearchResponseDto;
 import com.nuttty.eureka.auth.domain.model.User;
 import com.nuttty.eureka.auth.domain.model.UserRoleEnum;
+import com.nuttty.eureka.auth.exception.custom.AlreadyIsDeletedException;
 import com.nuttty.eureka.auth.infrastructure.repository.UserRepository;
 import com.nuttty.eureka.auth.presentation.request.UserRoleUpdateRequestDto;
 import com.nuttty.eureka.auth.presentation.request.UserSearchRequestDto;
@@ -25,8 +26,8 @@ public class UserService {
 
     // 회원 상세 조회
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = "userInfoCache", key = "#userId")
-    public UserInfoDto getUserInfo(Long userId) {
+    @Cacheable(cacheNames = "userInfoCache", key = "#role + ':' + #userId")
+    public UserInfoDto getUserInfo(UserRoleEnum role, Long userId) {
         // 조회 유저 가입 여부 검사
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 유저입니다."));
@@ -37,9 +38,9 @@ public class UserService {
 
     // 회원 권한 수정 - 토큰 재발급
     @Transactional
-    @CachePut(cacheNames = "userInfoCache", key = "#userId")
+    @CachePut(cacheNames = "userInfoCache", key = "#role + ':' + #userId")
     @CacheEvict(cacheNames = "userSearchInfoCache", allEntries = true)
-    public UserInfoDto updateUserRole(Long userId, UserRoleUpdateRequestDto updateRequestDto) {
+    public UserInfoDto updateUserRole(UserRoleEnum role, Long userId, UserRoleUpdateRequestDto updateRequestDto) {
         // 조회 유저 가입 여부 검사
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 유저입니다."));
@@ -58,6 +59,10 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 유저입니다."));
 
+        if (user.getIsDelete()) {
+            throw new AlreadyIsDeletedException("이미 탈퇴한 회원입니다.");
+        }
+
         // 논리적 회원 삭제
         user.delete(user.getEmail());
 
@@ -67,8 +72,8 @@ public class UserService {
 
     // 회원 검색
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = "userSearchInfoCache", key = "{#searchRequestDto.user_id, #searchRequestDto.role, #searchRequestDto.username, #searchRequestDto.email}")
-    public Page<UserSearchResponseDto> searchUserInfo(Pageable pageable, UserSearchRequestDto searchRequestDto) {
+    @Cacheable(cacheNames = "userSearchInfoCache", key = "#role + ':' + #searchRequestDto.user_id + ':' + #searchRequestDto.role + ':' + #searchRequestDto.username + ':' + #searchRequestDto.email")
+    public Page<UserSearchResponseDto> searchUserInfo(UserRoleEnum role, Pageable pageable, UserSearchRequestDto searchRequestDto) {
 
         return userRepository.findAllUser(pageable, searchRequestDto);
     }
