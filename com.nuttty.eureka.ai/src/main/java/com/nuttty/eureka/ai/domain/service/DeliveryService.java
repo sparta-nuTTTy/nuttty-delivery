@@ -30,7 +30,7 @@ public class DeliveryService {
         LocalDateTime endDate = LocalDateTime.now().withHour(5).withMinute(59).withSecond(59);
 
         // // 전일 오전 6시 ~ 금일 오전 5시 59분 59초 배송 정보 10만건 조회
-        DeliveryRequestDto findAllDelivery = orderClient.findAllDelivery(startDate, endDate, 100000);
+        DeliveryRequestDto findAllDelivery = orderClient.findAllDelivery(startDate, endDate, 100000, "19092");
         List<DeliveryDto> deliveryDtos = findAllDelivery.getData().getContent();
         // 출발 허브 별 배송 정보 매핑
         Map<UUID, List<DeliveryDto>> firstHub = new HashMap<>();

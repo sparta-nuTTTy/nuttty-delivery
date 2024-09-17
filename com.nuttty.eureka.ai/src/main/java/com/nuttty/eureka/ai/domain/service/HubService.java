@@ -25,7 +25,7 @@ public class HubService {
         List<HubDto> hubDtoList = new ArrayList<>();
 
         for (UUID hubId : hubIdList) {
-            HubDto hubDto = hubClient.findByHubId(hubId).getHubDto();
+            HubDto hubDto = hubClient.findByHubId(hubId, "19092").getHubDto();
             hubDtoList.add(hubDto);
         }
         return hubDtoList;

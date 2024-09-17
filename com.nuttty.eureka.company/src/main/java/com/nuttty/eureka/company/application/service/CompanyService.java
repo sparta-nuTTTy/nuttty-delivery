@@ -66,7 +66,7 @@ public class CompanyService {
 
             // 허브 ID 존재 유무 확인 v
             try {
-                HubRequestDto findHub = hubClient.findByHubId(request.getHub_id());
+                HubRequestDto findHub = hubClient.findByHubId(request.getHub_id(), "19092");
             } catch (RuntimeException e) {
                 log.error("Hub not found");
                 throw new EntityNotFoundException("Hub not found");
@@ -104,7 +104,7 @@ public class CompanyService {
 
             // 허브 ID 존재 유무 확인
             try {
-                hubClient.findByHubId(request.getHub_id());
+                hubClient.findByHubId(request.getHub_id(), "19092");
                 
             } catch (RuntimeException e) {
                 log.error("Hub not found");
@@ -126,7 +126,7 @@ public class CompanyService {
             // 허브 ID 존재 유무 확인 v
             HubRequestDto findHub = null;
             try {
-                findHub = hubClient.findByHubId(request.getHub_id());
+                findHub = hubClient.findByHubId(request.getHub_id(), "19092");
             } catch (RuntimeException e) {
                 log.error("Hub not found");
                 throw new EntityNotFoundException("Hub not found");
@@ -214,7 +214,7 @@ public class CompanyService {
 
             // 허브 ID 존재 유무 확인 v
             try {
-                hubClient.findByHubId(request.getHub_id());
+                hubClient.findByHubId(request.getHub_id(), "19092");
 
             } catch (RuntimeException e) {
                 log.error("Hub not found");
@@ -244,7 +244,7 @@ public class CompanyService {
 
             // 허브 ID 존재 유무 확인 v
             try {
-                hubClient.findByHubId(request.getHub_id());
+                hubClient.findByHubId(request.getHub_id(), "19092");
 
             } catch (RuntimeException e) {
                 log.error("Hub not found");
@@ -265,7 +265,7 @@ public class CompanyService {
             // 허브 ID 존재 유무 확인 v
             HubRequestDto findHub = null;
             try {
-                findHub = hubClient.findByHubId(request.getHub_id());
+                findHub = hubClient.findByHubId(request.getHub_id(), "19092");
             } catch (RuntimeException e) {
                 log.error("Hub not found");
                 throw new EntityNotFoundException("Hub not found");
