@@ -23,7 +23,7 @@ public class OrderDto {
     private String deliveryAddress;
     private String deliveryStatus;
 
-    private List<OrderItemDto> orderItemDtoList;
+    private List<OrderItemDto> productItems;
 
     private List<UUID> deliveryRoutes;
 }
