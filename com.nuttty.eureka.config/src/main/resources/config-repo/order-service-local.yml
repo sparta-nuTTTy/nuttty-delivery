@@ -58,3 +58,20 @@ management:
     tracing:
       sampling:
         probability: 1.0
+
+# Naver Direction API
+naver:
+  direction:
+    client-id: ${DIRECTION_CLIENT_ID}
+    client-secret: ${DIRECTION_CLIENT_SECRET}
+
+# resillience4j
+resilience4j:
+  retry:
+    instances:
+      createHubRoute:
+        maxAttempts: 3       # 최대 재시도 횟수
+        waitDuration: 2s     # 각 재시도 사이의 대기 시간
+        retryExceptions:
+          - java.net.SocketTimeoutException # 재시도를 수행할 예외 타입
+          - java.io.IOException
