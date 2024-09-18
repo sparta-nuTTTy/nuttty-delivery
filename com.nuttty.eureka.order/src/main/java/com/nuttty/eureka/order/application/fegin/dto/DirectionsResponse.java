@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 // Directions API 응답 DTO
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DirectionsResponse {
+public class DirectionsResponse implements Serializable {
     private int code;
     private String message;
     private String currentDateTime;
@@ -17,13 +18,13 @@ public class DirectionsResponse {
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Route {
+    public static class Route implements Serializable {
         @JsonProperty("traoptimal") // 추가된 필드
         private List<Trafast> traoptimal; // List<Trafast>로 정의
 
         @Data
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public static class Trafast {
+        public static class Trafast implements Serializable {
             @JsonProperty("summary")
             private Summary summary;
 
@@ -38,7 +39,7 @@ public class DirectionsResponse {
 
             @Data
             @JsonIgnoreProperties(ignoreUnknown = true)
-            public static class Summary {
+            public static class Summary implements Serializable {
                 @JsonProperty("start")
                 private Location start;
 
@@ -75,7 +76,7 @@ public class DirectionsResponse {
 
             @Data
             @JsonIgnoreProperties(ignoreUnknown = true)
-            public static class Section {
+            public static class Section implements Serializable {
                 private int pointIndex;
                 private int pointCount;
                 private int distance;
@@ -86,7 +87,7 @@ public class DirectionsResponse {
 
             @Data
             @JsonIgnoreProperties(ignoreUnknown = true)
-            public static class Guide {
+            public static class Guide implements Serializable {
                 private int pointIndex;
                 private int type;
                 private String instructions;

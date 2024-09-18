@@ -5,6 +5,7 @@ import com.nuttty.eureka.order.application.fegin.dto.WayPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,6 +30,8 @@ public class NaverDirectionService {
     @Value("${naver.direction.client-secret}")
     private String clientSecret;
 
+    // 변동 되는 값이 없기 때문에 캐시 적용
+    @Cacheable(value = "directions", key = "#wayPoints")
     public DirectionsResponse getDirecitons(List<WayPoint> wayPoints) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-NCP-APIGW-API-KEY-ID", clientId);
