@@ -1,5 +1,6 @@
 package com.nuttty.eureka.order.presentation.controller;
 
+import com.nuttty.eureka.order.application.security.UserDetailsImpl;
 import com.nuttty.eureka.order.application.service.DeliveryService;
 import com.nuttty.eureka.order.presentation.dto.ResultResponse;
 import com.nuttty.eureka.order.util.SuccessCode;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -29,10 +31,8 @@ public class DeliveryController {
      */
     @GetMapping("/{deliveryId}")
     public ResultResponse<DeliveryResponseDto> getDelivery(
-            @PathVariable("deliveryId") UUID deliveryId,
-            @RequestHeader(value = "X-User-Id") Long userId,
-            @RequestHeader(value = "X-User-Role") String role) {
-        log.info("배송 단건 조회 시도 중 | deliveryId: {}, loginUser: {}", deliveryId, userId);
+            @PathVariable("deliveryId") UUID deliveryId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("배송 단건 조회 시도 중 | deliveryId: {}, loginUser: {}", deliveryId, userDetails.getUserId());
 
         DeliveryResponseDto deliveryResponseDto = deliveryService.getDelivery(deliveryId);
 
@@ -82,9 +82,8 @@ public class DeliveryController {
     public ResultResponse<DeliveryUpdateResponseDto> updateDelivery(
             @PathVariable("deliveryId") UUID deliveryId,
             @RequestBody DeliveryUpdateRequestDto deliveryUpdateRequestDto,
-            @RequestHeader(value = "X-User-Id") Long userId,
-            @RequestHeader(value = "X-User-Role") String role) {
-        log.info("배송 수정 시도 중 | deliveryId: {}, request: {}, loginUser: {}", deliveryId, deliveryUpdateRequestDto, userId);
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("배송 수정 시도 중 | deliveryId: {}, request: {}, loginUser: {}", deliveryId, deliveryUpdateRequestDto, userDetails.getUserId());
 
         // 배송 수정 로직
         DeliveryUpdateResponseDto deliveryUpdateResponseDto = deliveryService.updateDelivery(deliveryId, deliveryUpdateRequestDto);

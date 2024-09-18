@@ -1,15 +1,19 @@
 package com.nuttty.eureka.order.config;
 
+import com.nuttty.eureka.order.application.jwt.CustomPreAuthFilter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,18 +21,23 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Configuration
-@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomPreAuthFilter customPreAuthFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(new CustomIPFilter(), UsernamePasswordAuthenticationFilter.class) // IP 필터 추가
-                .authorizeHttpRequests(authz -> authz
-                        .anyRequest().permitAll() // 모든 요청을 허용
-                )
-                .csrf(AbstractHttpConfigurer::disable);
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .anyRequest().authenticated()) // 모든 요청을 허용
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        http.addFilterBefore(new CustomIPFilter(), UsernamePasswordAuthenticationFilter.class); // IP 필터 추가
+        http.addFilterBefore(customPreAuthFilter, UsernamePasswordAuthenticationFilter.class); // CustomPreFilter 인가 과정 추가
         return http.build();
     }
 }
@@ -38,7 +47,7 @@ class CustomIPFilter extends OncePerRequestFilter {
     private static final String GATEWAY_PORT = "19092";
     private static final String LOCAL_IPv4 = "127.0.0.1";
     private static final String LOCAL_IPv6 = "0:0:0:0:0:0:0:1";
-    private static final String SWAGGER_PORT = "19094";
+    private static final String SWAGGER_PORT = "19096";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -55,8 +64,6 @@ class CustomIPFilter extends OncePerRequestFilter {
 
         String remoteAddr = request.getRemoteAddr();
         String forwardedPort = request.getHeader("X-Forwarded-Port");
-        System.out.println(remoteAddr);
-        System.out.println(forwardedPort);
 
         // swagger 테스트 시 사용할 포트
         // GATEWAY_PORT.equals(forwardedPort) 대신 SWAGGER_PORT.equals(s) 사용할 것
