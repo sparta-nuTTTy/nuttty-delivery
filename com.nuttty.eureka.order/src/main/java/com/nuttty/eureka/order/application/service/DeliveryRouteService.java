@@ -41,8 +41,12 @@ public class DeliveryRouteService {
                 .departureHubId(deliveryRoute.getHubRoute().getDepartureHubId())
                 .arrivalHubId(deliveryRoute.getHubRoute().getArrivalHubId())
                 .routeInfo(deliveryRoute.getHubRoute().getRouteInfo())
-                .estmatedDistance("허브 간 이동 정보 외부 API 연동 후 계산")
-                .estimatedTime("허브 간 이동 정보 외부 API 연동 후 계산")
+                // meters -> kilometers
+                .estmatedDistance(String.format("%.2f KM", deliveryRoute.getHubRoute().getDistanceInKilometers() / 1000.0))
+                // millisecond -> hours and minutes
+                .estimatedTime(String.format("%d시간 %d분",
+                        (int) (deliveryRoute.getHubRoute().getDuration() / 3600000),
+                        (int) (deliveryRoute.getHubRoute().getDuration() / 60000) % 60))
                 .build();
     }
 
