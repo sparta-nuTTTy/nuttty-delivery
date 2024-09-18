@@ -10,6 +10,7 @@ import com.nuttty.eureka.order.infrastructure.repository.HubRouteRepository;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,8 @@ public class HubRouteService {
     private final HubRouteRepository hubRouteRepository;
     private final NaverDirectionService naverDirectionService;
 
-    // 보상 트랜잭션에 필요한 경로들을 추적할 리스트
-    private final List<HubRoute> successfullyCreatedRoutes = new ArrayList<>();
+    // 보상 트랜잭션에 필요한 경로들을 저장할 Set(중복 방지)
+    private final Set<HubRoute> successfullyCreatedRoutes = new HashSet<>();
 
     @Transactional
     public void createAllHubRoutes() {
@@ -41,24 +42,32 @@ public class HubRouteService {
                 log.info("현재 허브: {}, 다음 허브: {}", currentHub.getName(), nextHub.getName());
 
                 // 두 허브 간 양방향 이동 경로 생성 (A -> B, B -> A)
-                // Resilience4j @Retry 적용
-                boolean hubRoute = createHubRoute(currentHub, nextHub);
-                boolean hubRouteReverse = createHubRoute(nextHub, currentHub);
+               processHubRoutes(currentHub, nextHub);
 
-                // 허브 간 경로 실패시 정합성 유지를 위해 보상 트랜잭션 필요
-                if (!hubRoute || !hubRouteReverse) {
-                    log.error("허브 경로 생성 실패 | currentHub: {}, nextHub: {}", currentHub.getName(), nextHub.getName());
-
-                    // 보상 트랜잭션
-                    performCompensation(); // 실패 시 보상 트랜잭션 실행
-                }
             }
         } catch (Exception e) {
             log.error("허브 경로 생성 중 오류 발생 | {}", e.getMessage());
+            performCompensation();  // 보상 트랜잭션 실행
+            throw e;
         }
 
     }
 
+    /**
+     * 허브 간 양방향 경로 생성
+     * @param currentHub: 현재 허브
+     * @param nextHub: 다음 허브
+     */
+    private void processHubRoutes(HubDto currentHub, HubDto nextHub) {
+        // A -> B
+        createHubRoute(currentHub, nextHub);
+        // B -> A
+        createHubRoute(nextHub, currentHub);
+    }
+
+    /**
+     * 보상 트랜잭션 실행
+     */
     private void performCompensation() {
         log.info("보상 트랜잭션 실행: 성공적으로 생성된 경로들 롤백 중...");
         for (HubRoute route : successfullyCreatedRoutes) {
@@ -72,10 +81,12 @@ public class HubRouteService {
         successfullyCreatedRoutes.clear(); // 롤백 완료 후 리스트 초기화
     }
 
-    // Resilience4j @Retry 적용
-    // 3회까지 재시도, 재시도 실패 시 handleCreateHubRouteFailure 메서드 호출
+    /**
+     * Resilience4j @Retry 적용
+     * 3회까지 재시도, 재시도 실패 시 handleCreateHubRouteFailure 메서드 호출
+     */
     @Retry(name = "createHubRoute", fallbackMethod = "handleCreateHubRouteFailure")
-    private boolean createHubRoute(HubDto departureHub, HubDto arrivalHub) {
+    private void createHubRoute(HubDto departureHub, HubDto arrivalHub) {
         try {
             // Direction 5 API 호출하여 소요시간 및 거리 계산
             DirectionsResponse directions = naverDirectionService.getDirecitons(Arrays.asList(
@@ -101,10 +112,10 @@ public class HubRouteService {
 
             // DB에 저장
             hubRouteRepository.save(hubRoute);
+
             // 성공적으로 생성된 경로 리스트에 추가
             successfullyCreatedRoutes.add(hubRoute);
 
-            return true;
         } catch (Exception e) {
             log.error("Direction 5 허브 경로 생성 중 오류 발생 | departureHub: {}, arrivalHub: {}", departureHub.getName(), arrivalHub.getName());
             throw e; // 예외 발생 시 Resilience4j가 재시도
@@ -112,14 +123,18 @@ public class HubRouteService {
 
     }
 
-    // createHubRoute 메서드 실패 시 호출되는 메서드
-    private boolean handleCreateHubRouteFailure(HubDto departureHub, HubDto arrivalHub, Exception e) {
+    /**
+     * Resilience4j 재시도 실패 시 호출되는 메서드
+     */
+    private void handleCreateHubRouteFailure(HubDto departureHub, HubDto arrivalHub) {
         log.error("허브 경로 생성 실패 | departureHub: {}, arrivalHub: {}", departureHub.getName(), arrivalHub.getName());
-        return false;
+        performCompensation();  // 재시도 실패 시 보상 트랜잭션 실행
     }
 
 
     // 허브 간 경로 조회(전체 - DFS 방식으로 경로 탐색)
+    // Cacheable 적용하여 같은 경로에 대한 요청 시 캐시된 결과 반환
+    @Cacheable(value = "hubRoutes", key = "#startHubId.toString() + '-' + #endHubId.toString()")
     @Transactional(readOnly = true)
     public List<HubRoute> findAllHubRoutes(UUID startHubId, UUID endHubId) {
         // 경로 저장할 리스트
