@@ -25,6 +25,12 @@ public class CustomPreAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        // 인증(auth) 관련 요청은 토큰 X
+        if (request.getRequestURI().startsWith("/api/v1/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         log.info("CustomPreAuthFilter 동작 시작 #####");
 
         String userId = request.getHeader("X-User-Id");

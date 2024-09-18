@@ -10,7 +10,6 @@ import com.nuttty.eureka.auth.infrastructure.repository.UserRepository;
 import com.nuttty.eureka.auth.presentation.request.LoginRequestDto;
 import com.nuttty.eureka.auth.presentation.request.SignupRequestDto;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,6 +20,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j(topic = "AuthService")
@@ -90,5 +90,15 @@ public class AuthService {
         // 토큰 생성
         log.info("토큰 생성 시작 #####");
         return jwtUtil.createAccessToken(user.getUserId(), user.getRole());
+    }
+
+    // Other-Service 에서 User의 정보를 호출하기 위한 메서드
+    @Transactional(readOnly = true)
+    public UserInfoDto fetchUserInfo(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 유저입니다."));
+
+        return UserInfoDto.of(user);
     }
 }

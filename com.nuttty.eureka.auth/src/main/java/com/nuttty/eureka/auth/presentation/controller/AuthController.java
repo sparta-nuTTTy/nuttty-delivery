@@ -9,6 +9,7 @@ import com.nuttty.eureka.auth.util.ResultResponse;
 import com.nuttty.eureka.auth.util.SuccessCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,5 +39,12 @@ public class AuthController {
                 .resultCode(SuccessCode.INSERT_SUCCESS.getStatus())
                 .resultMessage(SuccessCode.INSERT_SUCCESS.getMessage())
                 .build();
+    }
+
+    // FeignClient로 요청 될 유저 상세정보 메서드
+    @GetMapping("/users/{user_id}/info")
+    public ResponseEntity<UserInfoDto> fetchUserInfo(@PathVariable("user_id") Long userId) {
+
+        return ResponseEntity.ok(authService.fetchUserInfo(userId));
     }
 }
