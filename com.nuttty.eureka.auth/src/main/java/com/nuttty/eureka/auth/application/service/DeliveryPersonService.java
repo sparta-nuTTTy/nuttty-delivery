@@ -47,7 +47,7 @@ public class DeliveryPersonService {
         // 허브 관리자 권한 경우
         if (role.equals(UserRoleEnum.HUB_MANAGER)) {
             // 허브 존재 여부 검사
-            HubRequestDto hubInfo = hubClient.findOneHub(createDto.getHubId()).getBody();
+            HubRequestDto hubInfo = hubClient.findOneHub(createDto.getHubId(), "19092").getBody();
             if (hubInfo == null) {
                 throw new EntityNotFoundException("등록되지 않은 허브입니다.");
             }
@@ -60,7 +60,7 @@ public class DeliveryPersonService {
 
         // 배송담당자 타입이 업체 배송 담당자인 경우, 소속 허브ID가 존재하는 허브인지 확인
         if (DeliveryPersonTypeEnum.valueOf(createDto.getDeliveryPersonType()).equals(DeliveryPersonTypeEnum.COMPANY_DELIVERY_PERSON)) {
-            HubRequestDto hubInfo = hubClient.findOneHub(createDto.getHubId()).getBody();
+            HubRequestDto hubInfo = hubClient.findOneHub(createDto.getHubId(), "19092").getBody();
             if (hubInfo == null) {
                 throw new EntityNotFoundException("등록되지 않은 허브입니다.");
             }
@@ -104,7 +104,7 @@ public class DeliveryPersonService {
             // 업체 배송 담당자 경우 허브 Id 존재 - 소속 허브Id 관리자와 로그인 유저 일치 여부 검사
             if (deliveryPerson.getDeliveryPersonType().equals(DeliveryPersonTypeEnum.COMPANY_DELIVERY_PERSON)) {
                 // 배송 담당자의 허브의 허브 관리자 Id 가져오기
-                HubRequestDto hubInfo = hubClient.findOneHub(deliveryPerson.getHubId()).getBody();
+                HubRequestDto hubInfo = hubClient.findOneHub(deliveryPerson.getHubId(), "19092").getBody();
                 if (hubInfo == null) {
                     throw new EntityNotFoundException("등록되지 않은 허브입니다.");
                 }
@@ -133,7 +133,7 @@ public class DeliveryPersonService {
             // 업체 배송 담당자 경우 허브 Id 존재 - 소속 허브Id 관리자와 로그인 유저 일치 여부 검사
             if (deliveryPerson.getDeliveryPersonType().equals(DeliveryPersonTypeEnum.COMPANY_DELIVERY_PERSON)) {
                 // 배송 담당자의 허브의 허브 관리자 Id 가져오기
-                HubRequestDto hubInfo = hubClient.findOneHub(deliveryPerson.getHubId()).getBody();
+                HubRequestDto hubInfo = hubClient.findOneHub(deliveryPerson.getHubId(), "19092").getBody();
                 if (hubInfo == null) {
                     throw new EntityNotFoundException("등록되지 않은 허브입니다.");
                 }
@@ -152,7 +152,7 @@ public class DeliveryPersonService {
         UUID updateHubId = null; // 수정할 허브 id
         // 수정할 배송 담당자 타입이 업체 배송 담당자인 경우, 소속 허브ID가 존재하는 허브인지 확인 ;
         if (updateType.equals(DeliveryPersonTypeEnum.COMPANY_DELIVERY_PERSON)) {
-            HubRequestDto hubInfo = hubClient.findOneHub(updateDto.getHubId()).getBody();
+            HubRequestDto hubInfo = hubClient.findOneHub(updateDto.getHubId(), "19092").getBody();
             if (hubInfo == null) {
                 throw new EntityNotFoundException("등록되지 않은 허브입니다.");
             }
@@ -190,7 +190,7 @@ public class DeliveryPersonService {
             // 업체 배송 담당자 경우 허브 Id 존재 - 소속 허브Id 관리자와 로그인 유저 일치 여부 검사
             if (deliveryPerson.getDeliveryPersonType().equals(DeliveryPersonTypeEnum.COMPANY_DELIVERY_PERSON)) {
                 // 배송 담당자의 허브의 허브 관리자 Id 가져오기
-                HubRequestDto hubInfo = hubClient.findOneHub(deliveryPerson.getHubId()).getBody();
+                HubRequestDto hubInfo = hubClient.findOneHub(deliveryPerson.getHubId(), "19092").getBody();
                 if (hubInfo == null) {
                     throw new EntityNotFoundException("등록되지 않은 허브입니다.");
                 }

@@ -1,9 +1,10 @@
 package com.nuttty.eureka.hub.application.service;
 
 import com.nuttty.eureka.hub.application.client.AuthClient;
-import com.nuttty.eureka.hub.application.dto.AuthRequestDto;
 import com.nuttty.eureka.hub.application.dto.HubDto;
+import com.nuttty.eureka.hub.application.dto.UserDto;
 import com.nuttty.eureka.hub.domain.model.Hub;
+import com.nuttty.eureka.hub.domain.model.UserRoleEnum;
 import com.nuttty.eureka.hub.exception.exceptionsdefined.DelegationException;
 import com.nuttty.eureka.hub.infrastructure.repository.HubRepository;
 import com.nuttty.eureka.hub.presestation.request.HubRequestDto;
@@ -47,13 +48,13 @@ public class HubService {
     public HubResponseDto createHub(HubRequestDto request, Long userId) {
 
         // userId 존재 유무 확인, 허브 관리지인지 확인 v
-        AuthRequestDto findAuth = authClient.findUserById(userId, request.getUser_id());
-        if (findAuth.getData() == null) {
+        UserDto findAuth = authClient.findUserById(request.getUser_id(), "19092").getBody();
+        if (findAuth == null) {
             log.error("not found user with id " + request.getUser_id());
             throw new EntityNotFoundException("not found user with id " + request.getUser_id());
 
         } else {
-            if (!findAuth.getData().getRole().equals("HUB_MANAGER")) {
+            if (!findAuth.getRole().equals(UserRoleEnum.HUB_MANAGER)) {
                 log.error("You need to register a user with the HUB_MANAGER role.");
                 throw new DelegationException("You need to register a user with the HUB_MANAGER role.");
             }
@@ -94,13 +95,13 @@ public class HubService {
                 new EntityNotFoundException("Hub with id " + hubId + " not found"));
 
         // userId 존재 유무 확인, 허브 관리지인지 확인 v
-        AuthRequestDto findAuth = authClient.findUserById(userId, request.getUser_id());
-        if (findAuth.getData() == null) {
+        UserDto findAuth = authClient.findUserById(request.getUser_id(), "19092").getBody();
+        if (findAuth == null) {
             log.error("not found user with id " + request.getUser_id());
             throw new EntityNotFoundException("not found user with id " + request.getUser_id());
 
         } else {
-            if (!findAuth.getData().getRole().equals("HUB_MANAGER")) {
+            if (!findAuth.getRole().equals(UserRoleEnum.HUB_MANAGER)) {
                 log.error("You need to register a user with the HUB_MANAGER role.");
                 throw new DelegationException("You need to register a user with the HUB_MANAGER role.");
             }

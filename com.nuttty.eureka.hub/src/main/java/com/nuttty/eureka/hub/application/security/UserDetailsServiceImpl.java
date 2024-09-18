@@ -1,7 +1,7 @@
-package com.nuttty.eureka.auth.application.security;
+package com.nuttty.eureka.hub.application.security;
 
-import com.nuttty.eureka.auth.domain.model.User;
-import com.nuttty.eureka.auth.infrastructure.repository.UserRepository;
+import com.nuttty.eureka.hub.application.client.AuthClient;
+import com.nuttty.eureka.hub.application.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,12 +12,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final AuthClient authClient;
 
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        User user = userRepository.findById(Long.valueOf(userId))
-                .orElseThrow(() -> new UsernameNotFoundException("Not Found userId: " + userId));
+        UserDto user = authClient.findUserById(Long.valueOf(userId), "19092").getBody();
 
         return new UserDetailsImpl(user);
     }
