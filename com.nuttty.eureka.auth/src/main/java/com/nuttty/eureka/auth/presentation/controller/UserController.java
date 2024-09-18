@@ -17,7 +17,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -84,7 +83,7 @@ public class UserController {
                                                                       UserSearchRequestDto searchRequestDto) {
         UserRoleEnum loggedUserRole = userDetails.getUser().getRole();
 
-        Page<UserSearchResponseDto> searchUserList = userService.searchUserInfo(loggedUserRole,pageable, searchRequestDto);
+        Page<UserSearchResponseDto> searchUserList = userService.searchUserInfo(loggedUserRole, pageable, searchRequestDto);
 
         return ResultResponse.<Page<UserSearchResponseDto>>builder()
                 .data(searchUserList)
