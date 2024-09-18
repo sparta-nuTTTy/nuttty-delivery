@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 public class HubRouteInitializer implements ApplicationListener<ApplicationReadyEvent> {
     private final HubRouteService hubRouteService;
 
+    @Scheduled(initialDelay = 5000, fixedDelay = Long.MAX_VALUE)
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
         log.info("허브 경로 초기화 시작");

@@ -1,5 +1,6 @@
 package com.nuttty.eureka.order.presentation.controller;
 
+import com.nuttty.eureka.order.application.security.UserDetailsImpl;
 import com.nuttty.eureka.order.application.service.OrderService;
 import com.nuttty.eureka.order.presentation.dto.ResultResponse;
 import com.nuttty.eureka.order.util.SuccessCode;
@@ -8,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -31,10 +33,9 @@ public class OrderController {
     @PostMapping
     public ResultResponse<OrderCreateResponseDto> createOrder(
             @RequestBody OrderCreateDto orderCreateDto,
-            @RequestHeader(value = "X-User-Id") Long userId,
-            @RequestHeader(value = "X-User-Role") String role) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        log.info("주문 생성 시도 중 | request: {}, loginUser: {}", orderCreateDto, userId);
+        log.info("주문 생성 시도 중 | request: {}, loginUser: {}", orderCreateDto, userDetails.getUserId());
         OrderCreateResponseDto orderCreateResponseDto = orderService.createOrder(orderCreateDto);
 
         log.info("주문 생성 성공 | response: {}", orderCreateResponseDto);
@@ -55,8 +56,7 @@ public class OrderController {
     @GetMapping("/{order_id}")
     public ResultResponse<OrderResponseDto> getOrder(
             @PathVariable("order_id") UUID orderId,
-            @RequestHeader(value = "X-User-Id") Long userId,
-            @RequestHeader(value = "X-User-Role") String role) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         log.info("주문 조회 시도 중 | orderId: {}", orderId);
         OrderResponseDto orderResponseDto = orderService.getOrder(orderId);
@@ -111,13 +111,10 @@ public class OrderController {
     @DeleteMapping("/{order_id}")
     public ResultResponse<OrderCancelResponseDto> cancelOrder(
             @PathVariable("order_id") UUID orderId,
-            @RequestHeader(value = "X-User-Id") Long userId,
-            @RequestHeader(value = "X-User-Role") String role,
-            @RequestHeader(value = "X-User-Email") String email
-    ) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         log.info("주문 취소 시도 중 | orderId: {}", orderId);
-        OrderCancelResponseDto orderCancelResponseDto = orderService.cancelOrder(orderId, email);
+        OrderCancelResponseDto orderCancelResponseDto = orderService.cancelOrder(orderId, userDetails.getUser().getEmail());
 
         log.info("주문 취소 성공 | response: {}", orderCancelResponseDto);
 
@@ -132,10 +129,9 @@ public class OrderController {
     public ResultResponse<OrderUpdateResponseDto> updateOrder(
             @PathVariable("order_id") UUID orderId,
             @RequestBody OrderUpdateDto orderUpdateDto,
-            @RequestHeader(value = "X-User-Id") Long userId,
-            @RequestHeader(value = "X-User-Role") String role
+            @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
-        log.info("주문 수정 시도 중 | orderId: {}, request: {}, loginUser: {}", orderId, orderUpdateDto, userId);
+        log.info("주문 수정 시도 중 | orderId: {}, request: {}, loginUser: {}", orderId, orderUpdateDto, userDetails.getUserId());
         OrderUpdateResponseDto orderUpdateResponseDto = orderService.updateOrder(orderId, orderUpdateDto);
 
         log.info("주문 수정 성공 | response: {}", orderUpdateResponseDto);

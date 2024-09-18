@@ -1,11 +1,13 @@
 package com.nuttty.eureka.order.presentation.controller;
 
+import com.nuttty.eureka.order.application.security.UserDetailsImpl;
 import com.nuttty.eureka.order.application.service.DeliveryRouteService;
 import com.nuttty.eureka.order.presentation.dto.DeliveryRouteDto.DeliveryRouteResponseDto;
 import com.nuttty.eureka.order.presentation.dto.ResultResponse;
 import com.nuttty.eureka.order.util.SuccessCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -28,9 +30,9 @@ public class DeliveryRouteController {
     @GetMapping("/{deliveryRouteId}")
     public ResultResponse<DeliveryRouteResponseDto> getDeliveryRoutes(
             @PathVariable("deliveryRouteId") UUID deliveryRouteId,
-            @RequestHeader(value = "X-User-Id") Long userId,
-            @RequestHeader(value = "X-User-Role") String role) {
-        log.info("배송 경로 단건 조회 시도 중 | deliveryRouteId: {}, loginUser: {}", deliveryRouteId, userId);
+            @AuthenticationPrincipal UserDetailsImpl userDetails)
+    {
+        log.info("배송 경로 단건 조회 시도 중 | deliveryRouteId: {}, loginUser: {}", deliveryRouteId, userDetails.getUserId());
 
         DeliveryRouteResponseDto deliveryRouteResponseDto = deliveryRouteService.getDeliveryRoute(deliveryRouteId);
 
