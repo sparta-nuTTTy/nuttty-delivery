@@ -38,7 +38,6 @@ class CustomIPFilter extends OncePerRequestFilter {
     private static final String GATEWAY_PORT = "19092";
     private static final String LOCAL_IPv4 = "127.0.0.1";
     private static final String LOCAL_IPv6 = "0:0:0:0:0:0:0:1";
-    private static final String SWAGGER_PORT = "19097";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -55,13 +54,6 @@ class CustomIPFilter extends OncePerRequestFilter {
 
         String remoteAddr = request.getRemoteAddr();
         String forwardedPort = request.getHeader("X-Forwarded-Port");
-        System.out.println(remoteAddr);
-        System.out.println(forwardedPort);
-
-        // swagger 테스트 시 사용할 포트
-        // GATEWAY_PORT.equals(forwardedPort) 대신 SWAGGER_PORT.equals(s) 사용할 것
-        int localPort = request.getLocalPort();
-        String s = String.valueOf(localPort);
 
         if ((LOCAL_IPv4.equals(remoteAddr) || LOCAL_IPv6.equals(remoteAddr)) && GATEWAY_PORT.equals(forwardedPort)) {
             chain.doFilter(request, response);

@@ -7,11 +7,15 @@ import com.nuttty.eureka.hub.presestation.response.HubDelResponseDto;
 import com.nuttty.eureka.hub.presestation.response.HubResponseDto;
 import com.nuttty.eureka.hub.presestation.response.HubSearchResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,9 +46,16 @@ public class HubController {
      */
     @PostMapping("/hubs")
     @Operation(summary = "허브 생성", description = "허브 생성 합니다.")
-    @ApiResponse(responseCode = "201", description = "hub created")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "허브가 생성되었습니다."),
+            @ApiResponse(responseCode = "403", description = "허브 생성 권한이 없습니다."),
+    })
     public ResponseEntity<?> createHub(@Valid @RequestBody HubRequestDto request,
+
+                                       @Parameter(hidden = true)
                                        @RequestHeader(value = "X-User-Id") Long userId,
+
+                                       @Parameter(hidden = true)
                                        @RequestHeader(value = "X-User-Role") String role) {
         validateRoleMaster(role);
         log.info("허브 생성 시도 중 | request: {}, loginUser: {}", request, userId);
@@ -64,9 +75,21 @@ public class HubController {
      * @return
      */
     @PatchMapping("/hubs/{hub_id}")
+    @Operation(summary = "허브 수정", description = "허브 정보를 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "허브가 수정되었습니다."),
+            @ApiResponse(responseCode = "403", description = "허브 수정 권한이 없습니다."),
+            @ApiResponse(responseCode = "404", description = "허브가 존재하지 않습니다.")
+    })
     public ResponseEntity<?> updateHub(@Valid @RequestBody HubRequestDto request,
+
+                                       @Parameter(description = "수정할 허브의 ID")
                                        @PathVariable("hub_id") UUID hubId,
+
+                                       @Parameter(hidden = true)
                                        @RequestHeader(value = "X-User-Id") Long userId,
+
+                                       @Parameter(hidden = true)
                                        @RequestHeader(value = "X-User-Role") String role) {
         validateRoleMaster(role);
         log.info("허브 수정 시도 중 | request: {}, loginUser: {}, hubId: {}", request, userId, hubId);
@@ -85,8 +108,18 @@ public class HubController {
      * @return
      */
     @DeleteMapping("/hubs/{hub_id}")
-    public ResponseEntity<?> deleteHub(@PathVariable("hub_id") UUID hubId,
+    @Operation(summary = "허브 삭제", description = "허브를 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "허브가 삭제되었습니다."),
+            @ApiResponse(responseCode = "403", description = "허브 삭제 권한이 없습니다."),
+            @ApiResponse(responseCode = "404", description = "허브가 존재하지 않습니다.")
+    })
+    public ResponseEntity<?> deleteHub(@Parameter(description = "삭제할 허브의 ID") @PathVariable("hub_id") UUID hubId,
+
+                                       @Parameter(hidden = true)
                                        @RequestHeader(value = "X-User-Role") String role,
+
+                                       @Parameter(hidden = true)
                                        @RequestHeader(value = "X-User-Email") String email) {
         validateRoleMaster(role);
         log.info("허브 삭제 시도 중 | hubId: {}, role: {}, email: {}", hubId, role, email);
@@ -103,7 +136,12 @@ public class HubController {
      * @return
      */
     @GetMapping("/hubs/{hub_id}")
-    public ResponseEntity<?> findOneHub(@PathVariable("hub_id") UUID hubId) {
+    @Operation(summary = "허브 단건 조회", description = "허브 한 건을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "허브 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "허브가 존재하지 않습니다.")
+    })
+    public ResponseEntity<?> findOneHub(@Parameter(description = "조회할 허브의 ID") @PathVariable("hub_id") UUID hubId) {
         log.info("허브 단건 조회 시도 중 | hubId: {}", hubId);
 
         HubResponseDto response = hubService.findOneHub(hubId);
@@ -119,8 +157,37 @@ public class HubController {
      * @return
      */
     @GetMapping("/hubs")
-    public ResponseEntity<?> findAllHub(HubSearchRequestDto condition,
-                                        @PageableDefault(size = 20) Pageable pageable) {
+    @Operation(
+            summary = "허브 전체 조회",
+            description = "모든 허브를 페이징하여 조회합니다.",
+            parameters = {
+                    @Parameter(
+                            name = "hub_id",
+                            description = "허브의 고유 식별자 (UUID)",
+                            schema = @Schema(type = "string", format = "uuid")
+                    ),
+                    @Parameter(
+                            name = "user_id",
+                            description = "사용자의 고유 ID",
+                            schema = @Schema(type = "integer", format = "int64")
+                    ),
+                    @Parameter(
+                            name = "name",
+                            description = "허브의 이름",
+                            schema = @Schema(type = "string")
+                    ),
+                    @Parameter(
+                            name = "address",
+                            description = "허브의 주소",
+                            schema = @Schema(type = "string")
+                    )
+            }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "허브 전체 조회 성공")
+    })
+    public ResponseEntity<?> findAllHub(@Parameter(hidden = true) HubSearchRequestDto condition,
+                                        @ParameterObject @PageableDefault(size = 20) Pageable pageable) {
         log.info("허브 전체 조회 시도 중 | condition: {}, pageble: {}", condition, pageable);
 
         Page<HubSearchResponseDto> findAllHub = hubService.findAllHub(pageable, condition);
