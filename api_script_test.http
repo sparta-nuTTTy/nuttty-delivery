@@ -1,0 +1,38 @@
+@jwt_token = Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxOCIsInJvbGUiOiJNQVNURVIiLCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJpYXQiOjE3MjY3NDczNTMsImV4cCI6MTcyNjc1MDk1M30.Zucj6G8sywhtJ_dBMS3S_1SpizViGKmQ36AVCTcl5tQTGeZdzKqarpWtIOhvZ8xu
+
+### POST 마스터 로그인
+POST http://localhost:19092/api/v1/auth/login
+Content-Type: application/json
+
+{
+    "email": "user18@user.com",
+    "password": "Password18!"
+}
+
+### 주문 등록
+POST http://localhost:19092/api/v1/orders
+Content-Type: application/json
+Authorization:{{jwt_token}}
+
+{
+  "supplierId": "123e4567-e89b-12d3-a456-426614174000",
+  "receiverId": "123e4567-e89b-12d3-a456-426614174007",
+  "product_items": [
+    {
+      "product_id": "55014eb0-c1ad-4036-8100-fdadc8e0a91b",
+      "product_price": 20000.00,
+      "order_amount": 3
+    }
+  ]
+}
+
+### 주문 조회
+GET http://localhost:19092/api/v1/orders
+Content-Type: application/json
+Authorization:{{jwt_token}}
+
+
+#### 배송  조회
+GET http://localhost:19092/api/v1/deliveries
+Content-Type: application/json
+Authorization:{{jwt_token}}

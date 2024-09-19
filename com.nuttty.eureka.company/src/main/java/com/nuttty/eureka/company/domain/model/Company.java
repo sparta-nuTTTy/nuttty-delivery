@@ -63,4 +63,15 @@ public class Company extends AuditEntity{
         address = request.getAddress();
         return this;
     }
+
+    /**
+     * 업체 삭제 시 동록 상품도 삭제
+     * @param email
+     */
+    public void softDelete(String email) {
+        this.delete(email);
+        for (Product product : products) {
+            product.delete(email);
+        }
+    }
 }

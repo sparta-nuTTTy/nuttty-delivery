@@ -326,7 +326,7 @@ public class CompanyService {
         Company findCompany = companyRepository.findById(companyId).orElseThrow(() ->
                 new EntityNotFoundException("not found company"));
 
-        findCompany.delete(email);
+        findCompany.softDelete(email);
         return new CompanyDelResponseDto(HttpStatus.OK.value(), "company deleted", companyId + " deleted");
     }
 
