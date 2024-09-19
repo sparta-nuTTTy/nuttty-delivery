@@ -5,6 +5,10 @@ import com.nuttty.eureka.order.application.service.DeliveryRouteService;
 import com.nuttty.eureka.order.presentation.dto.DeliveryRouteDto.DeliveryRouteResponseDto;
 import com.nuttty.eureka.order.presentation.dto.ResultResponse;
 import com.nuttty.eureka.order.util.SuccessCode;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 
+@Tag(name = "배송 경로", description = "배송 경로 단건 조회")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -23,12 +28,14 @@ public class DeliveryRouteController {
     /**
      * 배송 경로 단건 조회
      * @param deliveryRouteId: 배송 경로 ID
-     * @param userId: 사용자 ID
-     * @param role: 사용자 권한
-     * @return: 배송 경로 조회 응답 DTO
+     * @param userDetails: 로그인 사용자 정보
+     * @return: 배송 경로 단건 조회 응답 DTO
      */
     @GetMapping("/{deliveryRouteId}")
+    @Operation(summary = "배송 경로 단건 조회", description = "배송 경로를 단건 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "배송 경로 단건 조회 성공")
     public ResultResponse<DeliveryRouteResponseDto> getDeliveryRoutes(
+            @Parameter(description = "배송 경로 ID")
             @PathVariable("deliveryRouteId") UUID deliveryRouteId,
             @AuthenticationPrincipal UserDetailsImpl userDetails)
     {
