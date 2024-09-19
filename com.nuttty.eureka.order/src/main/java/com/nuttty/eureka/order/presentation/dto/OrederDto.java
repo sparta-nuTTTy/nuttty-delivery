@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.nuttty.eureka.order.domain.model.DeliveryStatus;
 import com.nuttty.eureka.order.domain.model.OrderStatus;
 import com.querydsl.core.annotations.QueryProjection;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,11 +32,17 @@ public interface OrederDto {
     @Getter
     @Builder
     class OrderSearchDto {
+        @Schema(description = "검색 시작일")
         LocalDateTime startDate;
+        @Schema(description = "검색 종료일")
         LocalDateTime endDate;
+        @Schema(description = "주문 ID")
         UUID orderId;
+        @Schema(description = "공급업체 ID")
         UUID supplierId;
+        @Schema(description = "수령업체 ID")
         UUID receiverId;
+        @Schema(description = "주문 상태")
         String status;
     }
 
