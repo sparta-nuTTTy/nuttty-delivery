@@ -68,7 +68,7 @@ dependencies {
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.2.0'
 
 	// RabbitMQ
-	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+//	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 }
 
 dependencyManagement {
