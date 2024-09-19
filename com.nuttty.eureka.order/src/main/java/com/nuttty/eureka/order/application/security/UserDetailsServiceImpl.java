@@ -17,7 +17,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         // 이메일 == unique Column
-        UserDto user = authClient.findUserById(Long.valueOf(userId)).getBody();
+        UserDto user = authClient.findUserById(Long.valueOf(userId), "19092").getBody();
 
         return new UserDetailsImpl(user);
     }
