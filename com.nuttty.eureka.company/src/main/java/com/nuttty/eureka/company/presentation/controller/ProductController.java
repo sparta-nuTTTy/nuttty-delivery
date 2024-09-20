@@ -1,5 +1,6 @@
 package com.nuttty.eureka.company.presentation.controller;
 
+import com.nuttty.eureka.company.application.security.UserDetailsImpl;
 import com.nuttty.eureka.company.application.service.ProductService;
 import com.nuttty.eureka.company.presentation.request.ProductRequestDto;
 import com.nuttty.eureka.company.presentation.request.ProductSearchRequestDto;
@@ -20,10 +21,10 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -39,8 +40,7 @@ public class ProductController {
     /**
      * 상품 등록 | 마스터, 허브 관리자, 허브 업체(본인만) 허용
      * @param request
-     * @param role
-     * @param userId
+     * @param userDetails
      * @return
      */
     @Operation(summary = "상품 생성", description = "상품 생성 합니다.")
@@ -49,14 +49,14 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "상품 생성 권한이 없습니다."),
     })
     @PostMapping("/products")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'HUB_MANAGER', 'HUB_COMPANY')")
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequestDto request,
 
                                            @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Role") String role,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String role = userDetails.getUser().getRole().getAuthority();
+        Long userId = userDetails.getUserId();
 
-                                           @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Id") Long userId) {
-        validateExcludeRoleDeliveryPerson(role);
         log.info("상품 등록 시도 중 | request: {}, userId: {}, role: {}", request, userId, role);
 
         ProductResponseDto response = productService.createProduct(request, userId, role);
@@ -69,8 +69,7 @@ public class ProductController {
      * 상품 수정 | 마스터, 허브 관리자, 허브 업체(본인만) 허용
      * @param productId
      * @param request
-     * @param role
-     * @param userId
+     * @param userDetails
      * @return
      */
     @Operation(summary = "상품 수정", description = "상품 정보를 수정합니다.")
@@ -80,15 +79,15 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "상품가 존재하지 않습니다.")
     })
     @PatchMapping("/products/{product_id}")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'HUB_MANAGER', 'HUB_COMPANY')")
     public ResponseEntity<?> updateProduct(@Parameter(description = "수정할 상품 ID") @PathVariable("product_id") UUID productId,
                                            @Valid @RequestBody ProductUpdateRequestDto request,
 
                                            @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Role") String role,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String role = userDetails.getUser().getRole().getAuthority();
+        Long userId = userDetails.getUserId();
 
-                                           @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Id") Long userId) {
-        validateExcludeRoleDeliveryPerson(role);
         log.info("상품 수정 시도 중 | request: {}, userId: {}, role: {}, productId: {}", request, userId, role, productId);
 
         ProductResponseDto response = productService.updateProduct(productId, request, role, userId);
@@ -99,8 +98,7 @@ public class ProductController {
     /**
      * 상품 삭제 | 마스터 허용
      * @param productId
-     * @param role
-     * @param email
+     * @param userDetails
      * @return
      */
     @Operation(summary = "상품 삭제", description = "상품를 삭제합니다.")
@@ -110,13 +108,14 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "상품이 존재하지 않습니다.")
     })
     @DeleteMapping("/products/{product_id}")
+    @PreAuthorize("hasAuthority('MASTER')")
     public ResponseEntity<?> deleteProduct(@Parameter(description = "삭제할 상품 ID") @PathVariable("product_id") UUID productId,
 
                                            @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Role") String role,
-                                           @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Email") String email) {
-        validateRoleMaster(role);
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String role = userDetails.getUser().getRole().getAuthority();
+        String email = userDetails.getUser().getEmail();
+
         log.info("상품 삭제 시도 중 | productId: {}, role: {}, email: {}", productId, role, email);
 
         ProductDelResponseDto response = productService.deleteProduct(productId, email);
@@ -128,8 +127,7 @@ public class ProductController {
      * 재고 수량 추가 | 마스터, 허브 관리자, 허브 업체(본인만) 허용
      * @param productId
      * @param quantity
-     * @param role
-     * @param userId
+     * @param userDetails
      * @return
      */
     @Operation(summary = "상품 수량 추가", description = "상품 정보를 수정합니다.")
@@ -139,14 +137,15 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "상품가 존재하지 않습니다.")
     })
     @PatchMapping("/products/add_stock/{product_id}")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'HUB_MANAGER', 'HUB_COMPANY')")
     public ResponseEntity<?> addStock(@Parameter(description = "수량 추가할 상품 ID") @PathVariable("product_id") UUID productId,
                                       @Parameter(description = "추가할 수량") @RequestParam("quantity") Integer quantity,
 
                                       @Parameter(hidden = true)
-                                      @RequestHeader(value = "X-User-Role") String role,
-                                      @Parameter(hidden = true)
-                                      @RequestHeader(value = "X-User-Id") Long userId) {
-        validateExcludeRoleDeliveryPerson(role);
+                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String role = userDetails.getUser().getRole().getAuthority();
+        Long userId = userDetails.getUserId();
+
         log.info("재고 수량 추가 시도 중 | productId: {}, quantity: {}, role: {}", productId, quantity, role);
 
         ProductResponseDto response = productService.addStock(productId, quantity, role, userId);
@@ -264,31 +263,4 @@ public class ProductController {
         return response;
     }
 
-    /**
-     * 마스터 권한 확인
-     * @param role
-     * @return
-     */
-    private boolean validateRoleMaster(String role) {
-        if (!role.equals("MASTER")) {
-            log.error("마스터만 접근 가능합니다.");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "마스터만 접근 가능합니다.");
-        }else {
-            return true;
-        }
-    }
-
-    /**
-     * 배송 담당자 제외 검증
-     * @param role
-     * @return
-     */
-    private boolean validateExcludeRoleDeliveryPerson(String role) {
-        if (role.equals("HUB_DELIVERY_PERSON")) {
-            log.error("배송 담당자는 접근 불가능 합니다.");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "배송 담당자는 접근 불가능합니다.");
-        }else {
-            return true;
-        }
-    }
 }

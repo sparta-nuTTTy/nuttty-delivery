@@ -2,9 +2,10 @@ package com.nuttty.eureka.company.application.service;
 
 import com.nuttty.eureka.company.application.client.AuthClient;
 import com.nuttty.eureka.company.application.client.HubClient;
-import com.nuttty.eureka.company.application.dto.AuthRequestDto;
 import com.nuttty.eureka.company.application.dto.CompanyDto;
 import com.nuttty.eureka.company.application.dto.HubRequestDto;
+import com.nuttty.eureka.company.application.dto.UserDto;
+import com.nuttty.eureka.company.application.dto.UserRoleEnum;
 import com.nuttty.eureka.company.domain.model.Company;
 import com.nuttty.eureka.company.exception.exceptionsdefined.DelegationException;
 import com.nuttty.eureka.company.exception.exceptionsdefined.MissmatchException;
@@ -45,13 +46,13 @@ public class CompanyService {
      * @return
      */
     @Transactional
-    public CompanyResponseDto createCompany(CompanyRequestDto request, Long userId, String role) {
+    public CompanyResponseDto createCompany(CompanyRequestDto request, Long userId, UserRoleEnum role) {
 
-        if (role.equals("MASTER") || role.equals("HUB_MANAGER")) {
+        if (role.equals(UserRoleEnum.MASTER)) {
             // 유저 ID 존재 유무 확인 v
-            AuthRequestDto findAuth = null;
+            UserDto findAuth = null;
             try {
-                findAuth = authClient.findUserById(userId, request.getUser_id());
+                findAuth = authClient.findUserById(request.getUser_id()).getBody();
 
             } catch (RuntimeException e) {
                 log.error("User not found");
@@ -59,7 +60,7 @@ public class CompanyService {
             }
 
             // 허브 업체권한 유저인지 확인 v
-            if (!findAuth.getData().getRole().equals("HUB_COMPANY")) {
+            if (!findAuth.getRole().equals(UserRoleEnum.HUB_COMPANY)) {
                 log.error("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
                 throw new DelegationException("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
             }
@@ -88,7 +89,7 @@ public class CompanyService {
 
             return new CompanyResponseDto(HttpStatus.CREATED.value(), "company created", CompanyDto.toDto(savedCompany));
 
-        }  else if(role.equals("HUB_COMPANY")){ // HUB_COMPANY 일 경우
+        }  else if(role.equals(UserRoleEnum.HUB_COMPANY)){ // HUB_COMPANY 일 경우
 
             // 로그인 한 유저와 등록하려는 유저가 같은지 확인 v
             if (!request.getUser_id().equals(userId)) {
@@ -140,9 +141,9 @@ public class CompanyService {
             }
 
             // 유저 ID 존재 유무 확인 v
-            AuthRequestDto findAuth = null;
+            UserDto findAuth = null;
             try {
-                findAuth = authClient.findUserById(userId, request.getUser_id());
+                findAuth = authClient.findUserById(request.getUser_id()).getBody();
 
             } catch (RuntimeException e) {
                 log.error("User not found");
@@ -150,7 +151,7 @@ public class CompanyService {
             }
 
             // 허브 업체권한 유저인지 확인 v
-            if (!findAuth.getData().getRole().equals("HUB_COMPANY")) {
+            if (!findAuth.getRole().equals(UserRoleEnum.HUB_COMPANY)) {
                 log.error("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
                 throw new DelegationException("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
             }
@@ -191,9 +192,9 @@ public class CompanyService {
                     new EntityNotFoundException("not found company"));
 
             // 존재하는 유저 ID 인지 확인 v
-            AuthRequestDto findAuth = null;
+            UserDto findAuth = null;
             try {
-                findAuth = authClient.findUserById(userId, request.getUser_id());
+                findAuth = authClient.findUserById(request.getUser_id()).getBody();
 
             } catch (RuntimeException e) {
                 log.error("User not found");
@@ -201,7 +202,7 @@ public class CompanyService {
             }
 
             // 허브 업체 유저인지 확인 v
-            if (!findAuth.getData().getRole().equals("HUB_COMPANY")) {
+            if (!findAuth.getRole().equals(UserRoleEnum.HUB_COMPANY)) {
                 log.error("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
                 throw new DelegationException("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
             }
@@ -283,9 +284,9 @@ public class CompanyService {
                     new EntityNotFoundException("not found company"));
 
             // 존재하는 유저 ID 인지 확인 v
-            AuthRequestDto findAuth = null;
+            UserDto findAuth = null;
             try {
-                findAuth = authClient.findUserById(userId, request.getUser_id());
+                findAuth = authClient.findUserById(request.getUser_id()).getBody();
 
             } catch (RuntimeException e) {
                 log.error("User not found");
@@ -293,7 +294,7 @@ public class CompanyService {
             }
 
             // 허브 업체 유저인지 확인 v
-            if (!findAuth.getData().getRole().equals("HUB_COMPANY")) {
+            if (!findAuth.getRole().equals(UserRoleEnum.HUB_COMPANY)) {
                 log.error("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
                 throw new DelegationException("HUB_COMPANY 권한의 유저를 등록해야 합니다.");
             }

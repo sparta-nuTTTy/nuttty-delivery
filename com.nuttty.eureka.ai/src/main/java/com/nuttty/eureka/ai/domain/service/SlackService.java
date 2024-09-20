@@ -73,7 +73,8 @@ public class SlackService {
         for (Map.Entry<String, String> stringStringEntry : map.entrySet()) {
             String slackId = stringStringEntry.getKey();
             String message = stringStringEntry.getValue();
-
+            System.out.println(slackId);
+            System.out.println(message);
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .token(slackToken)
                     .channel(slackId)  // Slack 사용자 ID

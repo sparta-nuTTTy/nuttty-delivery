@@ -1,4 +1,4 @@
-package com.nuttty.eureka.auth.application.jwt;
+package com.nuttty.eureka.ai.application.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,7 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-@Slf4j(topic = "Auth Authorization")
+@Slf4j(topic = "Ai Authorization")
 @RequiredArgsConstructor
 public class CustomPreAuthFilter extends OncePerRequestFilter {
 

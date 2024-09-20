@@ -1,5 +1,6 @@
 package com.nuttty.eureka.hub.presestation.controller;
 
+import com.nuttty.eureka.hub.application.security.UserDetailsImpl;
 import com.nuttty.eureka.hub.application.service.HubService;
 import com.nuttty.eureka.hub.presestation.request.HubRequestDto;
 import com.nuttty.eureka.hub.presestation.request.HubSearchRequestDto;
@@ -22,8 +23,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -40,8 +42,6 @@ public class HubController {
     /**
      * 허브 생성 | 마스터 허용
      * @param request
-     * @param userId
-     * @param role
      * @return
      */
     @PostMapping("/hubs")
@@ -50,17 +50,11 @@ public class HubController {
             @ApiResponse(responseCode = "201", description = "허브가 생성되었습니다."),
             @ApiResponse(responseCode = "403", description = "허브 생성 권한이 없습니다."),
     })
-    public ResponseEntity<?> createHub(@Valid @RequestBody HubRequestDto request,
+    @PreAuthorize("hasAuthority('MASTER')")
+    public ResponseEntity<?> createHub(@Valid @RequestBody HubRequestDto request) {
+        log.info("허브 생성 시도 중 | request: {}", request);
 
-                                       @Parameter(hidden = true)
-                                       @RequestHeader(value = "X-User-Id") Long userId,
-
-                                       @Parameter(hidden = true)
-                                       @RequestHeader(value = "X-User-Role") String role) {
-        validateRoleMaster(role);
-        log.info("허브 생성 시도 중 | request: {}, loginUser: {}", request, userId);
-
-        HubResponseDto response = hubService.createHub(request, userId);
+        HubResponseDto response = hubService.createHub(request);
 
         log.info("허브 생성 성공 | response: {}", response);
         return ResponseEntity.ok(response);
@@ -70,8 +64,7 @@ public class HubController {
      * 허브 수정 | 마스터 허용
      * @param request
      * @param hubId
-     * @param userId
-     * @param role
+     * @param userDetails
      * @return
      */
     @PatchMapping("/hubs/{hub_id}")
@@ -81,17 +74,16 @@ public class HubController {
             @ApiResponse(responseCode = "403", description = "허브 수정 권한이 없습니다."),
             @ApiResponse(responseCode = "404", description = "허브가 존재하지 않습니다.")
     })
+    @PreAuthorize("hasAuthority('MASTER')")
     public ResponseEntity<?> updateHub(@Valid @RequestBody HubRequestDto request,
 
                                        @Parameter(description = "수정할 허브의 ID")
                                        @PathVariable("hub_id") UUID hubId,
 
                                        @Parameter(hidden = true)
-                                       @RequestHeader(value = "X-User-Id") Long userId,
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        Long userId = userDetails.getUserId();
 
-                                       @Parameter(hidden = true)
-                                       @RequestHeader(value = "X-User-Role") String role) {
-        validateRoleMaster(role);
         log.info("허브 수정 시도 중 | request: {}, loginUser: {}, hubId: {}", request, userId, hubId);
 
         HubResponseDto response = hubService.updateHub(request, hubId, userId);
@@ -103,8 +95,7 @@ public class HubController {
     /**
      * 허브 삭제 | 마스터 허용
      * @param hubId
-     * @param role
-     * @param email
+     * @param userDetails
      * @return
      */
     @DeleteMapping("/hubs/{hub_id}")
@@ -114,14 +105,14 @@ public class HubController {
             @ApiResponse(responseCode = "403", description = "허브 삭제 권한이 없습니다."),
             @ApiResponse(responseCode = "404", description = "허브가 존재하지 않습니다.")
     })
+    @PreAuthorize("hasAuthority('MASTER')")
     public ResponseEntity<?> deleteHub(@Parameter(description = "삭제할 허브의 ID") @PathVariable("hub_id") UUID hubId,
 
                                        @Parameter(hidden = true)
-                                       @RequestHeader(value = "X-User-Role") String role,
+                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String role = userDetails.getUser().getRole().getAuthority();
+        String email = userDetails.getUser().getEmail();
 
-                                       @Parameter(hidden = true)
-                                       @RequestHeader(value = "X-User-Email") String email) {
-        validateRoleMaster(role);
         log.info("허브 삭제 시도 중 | hubId: {}, role: {}, email: {}", hubId, role, email);
 
         hubService.deleteHub(hubId, email);
@@ -194,18 +185,5 @@ public class HubController {
 
         log.info("허브 전체 조회 완료 | condition: {}, pageble: {}", condition, pageable);
         return ResponseEntity.ok(findAllHub);
-    }
-
-    /**
-     * 마스터 권한 체크 메서드
-     * @param role
-     * @return
-     */
-    public boolean validateRoleMaster(String role) {
-        if (role.equals("MASTER")) {
-            return true;
-        } else {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "마스터만 접근 가능합니다.");
-        }
     }
 }

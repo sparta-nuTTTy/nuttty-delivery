@@ -42,6 +42,7 @@ public class AiService {
 
     /**
      * Ai 단 건 조회 | 마스터, 허브관리자, 배송 담당자
+     *
      * @param aiId
      * @return
      */
@@ -55,6 +56,7 @@ public class AiService {
 
     /**
      * ai 페이징 전체 조회 | 마스터, 허브관리자, 배송 담당자
+     *
      * @param pageable
      * @param condition
      * @return
@@ -65,6 +67,7 @@ public class AiService {
 
     /**
      * ai 삭제 | 마스터 허용
+     *
      * @param aiId
      * @param email
      * @return
@@ -82,6 +85,7 @@ public class AiService {
     /**
      * 공통 허브 배송 담당자 10명에게 허브별 주문 정보 슬랙 메세지 보내기
      * 전일 오전 8시 ~ 금일 오전 7시 59분 59초 허브 별 주문건
+     *
      * @throws IOException
      * @throws SlackApiException
      * @throws URISyntaxException
@@ -123,6 +127,7 @@ public class AiService {
     /**
      * 허브 별 날씨 정보 배송 기사에게 전송
      * 전일 오전 6시 ~ 금일 오전 5시 59분 59초 배송 정보
+     *
      * @throws URISyntaxException
      * @throws SlackApiException
      * @throws IOException

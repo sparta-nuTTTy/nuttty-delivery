@@ -33,7 +33,7 @@ public class DeliveryPersonService {
         // 공통 허브 배송 담당자 조회
         DeliveryPersonRequestDto hubTransferPerson = null;
         try {
-            hubTransferPerson = deliveryPersonClient.findAllCommonDeliveryPerson(20, "HUB_TRANSFER_PERSON", "MASTER");
+            hubTransferPerson = deliveryPersonClient.findAllCommonDeliveryPerson(20, "HUB_TRANSFER_PERSON", "MASTER", 18L);
         } catch (FeignException e) {
             int statusCode = e.status();
             String errorMessage = e.getMessage();
@@ -71,7 +71,7 @@ public class DeliveryPersonService {
         // 업체 배송 담당자 조회
         DeliveryPersonRequestDto allCompanyDeliveryPerson = null;
         try {
-            allCompanyDeliveryPerson = deliveryPersonClient.findAllCompanyDeliveryPerson(100000, "COMPANY_DELIVERY_PERSON", "MASTER");
+            allCompanyDeliveryPerson = deliveryPersonClient.findAllCompanyDeliveryPerson(100000, "COMPANY_DELIVERY_PERSON", "MASTER", 18L);
         } catch (FeignException e) {
             int statusCode = e.status();
             String errorMessage = e.getMessage();

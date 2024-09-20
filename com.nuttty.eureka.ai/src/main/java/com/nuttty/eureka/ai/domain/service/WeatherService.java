@@ -50,7 +50,7 @@ public class WeatherService {
                     + "&pageNo=1"
                     + "&numOfRows=1000"
                     + "&dataType=JSON"
-                    + "&base_date=" + format
+                    + "&base_date=" + 20240919
                     + "&base_time=0600"
                     + "&nx=" + hubDto.getLatitude()
                     + "&ny=" + hubDto.getLongitude());
@@ -86,6 +86,7 @@ public class WeatherService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(formattedJson);
+
 
             // 필요한 데이터 추출
             JsonNode items = root.path("response").path("body").path("items").path("item");
