@@ -52,8 +52,8 @@ public class WeatherService {
                     + "&dataType=JSON"
                     + "&base_date=" + 20240919
                     + "&base_time=0600"
-                    + "&nx=" + hubDto.getLatitude()
-                    + "&ny=" + hubDto.getLongitude());
+                    + "&nx=" + hubDto.getNx()
+                    + "&ny=" + hubDto.getNy());
 
             // GET 요청 보내기
             ResponseEntity<String> response = null;

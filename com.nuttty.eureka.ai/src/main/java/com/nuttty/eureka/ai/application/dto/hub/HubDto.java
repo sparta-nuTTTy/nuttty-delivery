@@ -24,6 +24,8 @@ public class HubDto {
 
     private String latitude;
     private String longitude;
+    private String nx;
+    private String ny;
 
     @JsonProperty("created_at")
     private LocalDateTime createdAt;

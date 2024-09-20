@@ -26,15 +26,20 @@ public class Hub extends AuditEntity{
     private String latitude;
     private String longitude;
 
+    private String nx;
+    private String ny;
+
     @Column(name = "user_id")
     private Long userId;
 
-    public Hub(String name, String address, String latitude, String longitude, Long userId) {
+    public Hub(String name, String address, String latitude, String longitude, Long userId, String nx, String ny) {
         this.name = name;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
         this.userId = userId;
+        this.nx = nx;
+        this.ny = ny;
     }
 
     /**
@@ -48,6 +53,8 @@ public class Hub extends AuditEntity{
         this.latitude = request.getLatitude();
         this.longitude = request.getLongitude();
         this.userId = request.getUser_id();
+        this.nx = request.getNx();
+        this.ny = request.getNy();
         return this;
     }
 }

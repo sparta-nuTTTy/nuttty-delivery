@@ -18,6 +18,8 @@ public class HubDto {
     private String address;
     private String latitude;
     private String longitude;
+    private String nx;
+    private String ny;
 
     private LocalDateTime created_at;
     private String created_by;

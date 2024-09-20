@@ -19,6 +19,8 @@ public class HubDto implements Serializable {
     private String address;
     private String latitude;
     private String longitude;
+    private String nx;
+    private String ny;
 
     private LocalDateTime created_at;
     private String created_by;
@@ -26,13 +28,15 @@ public class HubDto implements Serializable {
     private String updated_by;
 
     @QueryProjection
-    public HubDto(UUID hub_id, Long user_id, String name, String address, String latitude, String longitude, LocalDateTime created_at, String created_by, LocalDateTime updated_at, String updated_by) {
+    public HubDto(UUID hub_id, Long user_id, String name, String address, String latitude, String longitude, String nx, String ny, LocalDateTime created_at, String created_by, LocalDateTime updated_at, String updated_by) {
         this.hub_id = hub_id;
         this.user_id = user_id;
         this.name = name;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.nx = nx;
+        this.ny = ny;
         this.created_at = created_at;
         this.created_by = created_by;
         this.updated_at = updated_at;
@@ -46,6 +50,8 @@ public class HubDto implements Serializable {
                 hub.getAddress(),
                 hub.getLatitude(),
                 hub.getLongitude(),
+                hub.getNx(),
+                hub.getNy(),
                 hub.getCreatedAt(),
                 hub.getCreatedBy(),
                 hub.getUpdatedAt(),
