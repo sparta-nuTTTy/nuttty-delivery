@@ -41,6 +41,8 @@ public class HubRepositoryImpl implements HubRepositoryCustom {
                         hub.address,
                         hub.latitude,
                         hub.longitude,
+                        hub.nx,
+                        hub.ny,
                         hub.createdAt,
                         hub.createdBy,
                         hub.updatedAt,

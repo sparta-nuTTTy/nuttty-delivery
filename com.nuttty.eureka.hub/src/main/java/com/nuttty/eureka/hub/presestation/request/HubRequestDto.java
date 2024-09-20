@@ -37,7 +37,17 @@ public class HubRequestDto {
     @Schema(description = "허브 경도", example = "127.1048", type = "string")
     private String longitude;
 
+    @NotNull(message = "nx must be provided")
+    @NotBlank(message = "nx must be provided")
+    @Schema(description = "격자 좌표", example = "61", type = "string")
+    private String nx;
+
+    @NotNull(message = "nx must be provided")
+    @NotBlank(message = "nx must be provided")
+    @Schema(description = "격자 좌표", example = "126", type = "string")
+    private String ny;
+
     public Hub toEntity() {
-        return new Hub(name, address, latitude, longitude, user_id);
+        return new Hub(name, address, latitude, longitude, user_id, nx, ny);
     }
 }
