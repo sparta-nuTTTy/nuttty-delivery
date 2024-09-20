@@ -143,9 +143,9 @@
 
 ## :raising_hand::thought_balloon: Concern
 
-#### 메시징 시스템을 사용하여 각 서비스 간 비동기적으로 메시지를 전송하고, 이벤트 기반 통신을 구현 [WIKI보기](https://github.com/HH9C4/BBBB-BE/wiki/%5BConcern%5D-Access-Token-and-Refresh-Token-Reissue-Process)
+#### 메시징 시스템을 사용하여 각 서비스 간 비동기적으로 메시지를 전송하고, 이벤트 기반 통신을 구현
 
-#### 모니터링을 통해 병목지점이 확인 되는 곳을 찾아 개선 해보기 [WIKI보기](https://github.com/HH9C4/BBBB-BE/wiki/%5BConcern%5D-Comment-&-Like-Table-Structure)
+#### 모니터링을 통해 병목지점이 확인 되는 곳을 찾아 개선 해보기
 
 
 <br><br>
