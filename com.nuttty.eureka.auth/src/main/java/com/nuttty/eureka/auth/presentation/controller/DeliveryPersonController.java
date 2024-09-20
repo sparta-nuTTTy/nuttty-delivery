@@ -119,6 +119,7 @@ public class DeliveryPersonController {
                                                                                       @PageableDefault Pageable pageable,
                                                                                       DeliveryPersonSearchRequestDto searchRequestDto) {
         UserRoleEnum loggedUserRole = userDetails.getUser().getRole();
+        System.out.println(loggedUserRole);
 
         return ResultResponse.<Page<DeliveryPersonSearchResponseDto>>builder()
                 .data(deliveryPersonService.searchDeliveryPerson(loggedUserRole, pageable, searchRequestDto))

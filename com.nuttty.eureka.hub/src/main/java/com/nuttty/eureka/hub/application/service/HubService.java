@@ -37,15 +37,13 @@ public class HubService {
 
     /**
      * 허브 생성 | 마스터 허용
-     *
      * @param request
-     * @param userId
      * @return
      */
     @Transactional
     @CachePut(cacheNames = "hubCache", key = "#result.hubDto.hub_id")
     @CacheEvict(cacheNames = "hubSearchCache", allEntries = true)
-    public HubResponseDto createHub(HubRequestDto request, Long userId) {
+    public HubResponseDto createHub(HubRequestDto request) {
 
         // userId 존재 유무 확인, 허브 관리지인지 확인 v
         UserDto findAuth = authClient.findUserById(request.getUser_id(), "19092").getBody();
@@ -79,7 +77,6 @@ public class HubService {
 
     /**
      * 허브 수정 | 마스터 허용
-     *
      * @param request
      * @param hubId
      * @param userId

@@ -1,6 +1,8 @@
 package com.nuttty.eureka.company.presentation.controller;
 
 import com.nuttty.eureka.company.application.dto.CompanyDto;
+import com.nuttty.eureka.company.application.dto.UserRoleEnum;
+import com.nuttty.eureka.company.application.security.UserDetailsImpl;
 import com.nuttty.eureka.company.application.service.CompanyService;
 import com.nuttty.eureka.company.presentation.request.CompanyRequestDto;
 import com.nuttty.eureka.company.presentation.request.CompanySearchRequestDto;
@@ -20,10 +22,10 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,8 +42,6 @@ public class CompanyController {
     /**
      * 업체 생성 | 마스터, 허브 관리자, 허브 업체 허용
      * @param request
-     * @param role
-     * @param userId
      * @return
      */
     @Operation(summary = "업체 생성", description = "업체 생성 합니다.")
@@ -50,14 +50,13 @@ public class CompanyController {
             @ApiResponse(responseCode = "403", description = "업체 생성 권한이 없습니다."),
     })
     @PostMapping("/companies")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'HUB_MANAGER', 'HUB_COMPANY')")
     public ResponseEntity<?> createCompany(@Valid @RequestBody CompanyRequestDto request,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-                                           @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Role") String role,
+        UserRoleEnum role = userDetails.getUser().getRole();
+        Long userId = userDetails.getUserId();
 
-                                           @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Id") Long userId) {
-        validateExcludeRoleDeliveryPerson(role);
         log.info("업체 생산 시도 중 | request: {}, userId: {} | role: {}", request, userId, role);
 
         CompanyResponseDto response = companyService.createCompany(request, userId, role);
@@ -69,8 +68,7 @@ public class CompanyController {
      * 업체 수정 | 마스터, 허브 관리자, 허브 업체(본인만) 허용
      * @param companyId
      * @param request
-     * @param role
-     * @param userId
+     * @param userDetails
      * @return
      */
     @Operation(summary = "업체 수정", description = "업체 정보를 수정합니다.")
@@ -80,15 +78,14 @@ public class CompanyController {
             @ApiResponse(responseCode = "404", description = "업체가 존재하지 않습니다.")
     })
     @PatchMapping("/companies/{company_id}")
+    @PreAuthorize("hasAnyAuthority('MASTER', 'HUB_MANAGER', 'HUB_COMPANY')")
     public ResponseEntity<?> updateCompany(@Parameter(description = "수정할 업체 ID") @PathVariable("company_id") UUID companyId,
                                            @Valid @RequestBody CompanyRequestDto request,
 
                                            @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Role") String role,
-
-                                           @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Id") Long userId) {
-        validateExcludeRoleDeliveryPerson(role);
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String role = userDetails.getUser().getRole().getAuthority();
+        Long userId = userDetails.getUserId();
         log.info("업체 수정 시도 중 | request: {}, userId: {} | company_id: {}", request, userId, companyId);
 
         CompanyResponseDto response = companyService.updateCompany(request, companyId, userId, role);
@@ -99,8 +96,7 @@ public class CompanyController {
     /**
      * 업체 삭제 | 마스터 허용
      * @param companyId
-     * @param role
-     * @param email
+     * @param userDetails
      * @return
      */
     @Operation(summary = "업체 삭제", description = "업체를 삭제합니다.")
@@ -110,14 +106,13 @@ public class CompanyController {
             @ApiResponse(responseCode = "404", description = "업체가 존재하지 않습니다.")
     })
     @DeleteMapping("/companies/{company_id}")
+    @PreAuthorize("hasAuthority('MASTER')")
     public ResponseEntity<?> deleteCompany(@Parameter(description = "삭제할 업체의 ID") @PathVariable("company_id") UUID companyId,
 
                                            @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Role") String role,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String email = userDetails.getUser().getEmail();
 
-                                           @Parameter(hidden = true)
-                                           @RequestHeader(value = "X-User-Email") String email) {
-        validateRoleMaster(role);
         log.info("업체 삭제 시도 중 | company_id: {}, email: {}", companyId, email);
 
         CompanyDelResponseDto response = companyService.deleteCompany(companyId, email);
@@ -218,33 +213,5 @@ public class CompanyController {
         List<CompanyDto> response = companyService.findAllSupplierIdOfCompany(supplierId);
         log.info("supplierId 로 업체 전체 조회 완료");
         return ResponseEntity.ok(response);
-    }
-
-    /**
-     * 마스터 권한 확인
-     * @param role
-     * @return
-     */
-    private boolean validateRoleMaster(String role) {
-        if (!role.equals("MASTER")) {
-            log.error("마스터만 접근 가능합니다.");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "마스터만 접근 가능합니다.");
-        }else {
-            return true;
-        }
-    }
-
-    /**
-     * 배송 담당자 제외 검증
-     * @param role
-     * @return
-     */
-    private boolean validateExcludeRoleDeliveryPerson(String role) {
-        if (role.equals("HUB_DELIVERY_PERSON")) {
-            log.error("배송 담당자는 접근 불가능 합니다.");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "배송 담당자는 접근 불가능합니다.");
-        }else {
-            return true;
-        }
     }
 }

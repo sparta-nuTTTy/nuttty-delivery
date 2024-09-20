@@ -1,4 +1,5 @@
-@jwt_token = Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxOCIsInJvbGUiOiJNQVNURVIiLCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJpYXQiOjE3MjY3NDczNTMsImV4cCI6MTcyNjc1MDk1M30.Zucj6G8sywhtJ_dBMS3S_1SpizViGKmQ36AVCTcl5tQTGeZdzKqarpWtIOhvZ8xu
+@jwt_token = Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIxOCIsInJvbGUiOiJNQVNURVIiLCJpc3MiOiJhdXRoLXNlcnZpY2UiLCJpYXQiOjE3MjY3NjU0NTMsImV4cCI6MTcyNjc2OTA1M30.7ApPYk5Uep9ycF4sz3HJkIdHDUFeX4AfBtBux4vJG0NVeuwSMH7HeBqUG9voInGr
+@deliveryRouteId = c4d6c8a7-6fd1-4693-9266-a7988af6fa4b
 
 ### POST 마스터 로그인
 POST http://localhost:19092/api/v1/auth/login
@@ -9,7 +10,7 @@ Content-Type: application/json
     "password": "Password18!"
 }
 
-### 주문 등록
+### 주문 등록 - 1
 POST http://localhost:19092/api/v1/orders
 Content-Type: application/json
 Authorization:{{jwt_token}}
@@ -21,7 +22,24 @@ Authorization:{{jwt_token}}
     {
       "product_id": "55014eb0-c1ad-4036-8100-fdadc8e0a91b",
       "product_price": 20000.00,
-      "order_amount": 3
+      "order_amount": 1
+    }
+  ]
+}
+
+### 주문 등록 - 2
+POST http://localhost:19092/api/v1/orders
+Content-Type: application/json
+Authorization:{{jwt_token}}
+
+{
+  "supplierId": "123e4567-e89b-12d3-a456-426614174006",
+  "receiverId": "123e4567-e89b-12d3-a456-426614174033",
+  "product_items": [
+    {
+      "product_id": "56389e65-68f4-433a-ab66-0ed065a4b6e8",
+      "product_price": 19000.00,
+      "order_amount": 1
     }
   ]
 }
@@ -36,3 +54,13 @@ Authorization:{{jwt_token}}
 GET http://localhost:19092/api/v1/deliveries
 Content-Type: application/json
 Authorization:{{jwt_token}}
+
+#### 배송 경로 조회
+GET http://localhost:19092/api/v1/delivery-routes/{{deliveryRouteId}}
+Content-Type: application/json
+Authorization: {{jwt_token}}
+
+#### 날씨 데이터 슬랙 전송
+GET http://localhost:19092/api/v1/ai/weather
+Content-Type: application/json
+Authorization: {{jwt_token}}

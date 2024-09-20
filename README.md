@@ -41,14 +41,17 @@
 
 ### 🏭 허브 (CRUD)
 > * 애플리케이션 초기 시점 전국 17 개 허브 생성
-> * 권한 별 접근 관리 및 권한 별 예외 처리
+> * 허브 정보 수정 및 삭제 기능 지원
+> * 허브 관리에 대한 권한별 접근 제어 구현
 
 ### 🏢 업체 (CRUD)
-> * 업체 : 업체 CRUD - 권한 별 접근 관리, 업체 삭제 시 등록된 상품도 삭제 처리
-> * 상품 : 상품 CRUD - 권한 별 접근 관리, 상품의 등록, 수정 시 업체 존재 유무 확인
+> * 업체 등록, 수정 시 업체 주인의 권한인 사람 등록, 수정 가능 (마스터, 허브 관리자 대리 등록, 수정 가능)
+> * 업체 삭제 시 등록된 상품 같이 삭제
+> * 상품 등록, 수정 시 업체 주인의 권한인 사람 등록, 수정 가능 (마스터, 허브 관리자 대리 등록, 수정 가능)
 
 ### 🤖 AI (CRUD)
-> * AI : AI CRUD - 권한 별 접근 관리
+> * AI 답변 받은 내용 조회 구현
+> * AI 답변 내용 삭제 (마스터만 가능)
 
 ### 🚛 주문 (CRUD)
 > * 허브 경로 생성 - 애플리케이션 초기 시점 허브 리스트 조회 후 허브 간 이동 경로 생성 및 저장 
@@ -120,9 +123,9 @@
 
 #### Feign Client로 PATCH method 사용 불가 문제 [WIKI보기]
 
-#### 소프트 딜리트로 인해 유티크 제약 설정 문제 [WIKI보기]
+#### 소프트 딜리트로 인해 유티크 제약 설정 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-%EC%86%8C%ED%94%84%ED%8A%B8-%EB%94%9C%EB%A6%AC%ED%8A%B8%EB%A1%9C-%EC%9D%B8%ED%95%B4-%EC%9C%A0%EB%8B%88%ED%81%AC-%EC%A0%9C%EC%95%BD-%EC%84%A4%EC%A0%95-%EB%AC%B8%EC%A0%9C)
 
-#### 기상청 API 호출 시 URL 인코딩 문제 [WIKI보기]
+#### 기상청 API 호출 시 URL 인코딩 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-%EA%B8%B0%EC%83%81%EC%B2%AD-API-%ED%98%B8%EC%B6%9C-%EC%8B%9C-URL-%EC%9D%B4%EC%A4%91-%EC%9D%B8%EC%BD%94%EB%94%A9-%EB%AC%B8%EC%A0%9C)
 
 #### Jwt기반의 인증인가 보안성(Security 추가 적용) [WIKI보기]
 
@@ -130,7 +133,7 @@
 
 #### jackson 라이브러리와 FeginClient 사용 시 문제 [WIKI보기]
 
-#### Redis 페이지 검색 조건 키 설정 문제 [WIKI보기]
+#### Redis 페이지 검색 조건 키 설정 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-Redis-%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B2%80%EC%83%89-%EC%A1%B0%EA%B1%B4-%ED%82%A4-%EC%84%A4%EC%A0%95-%EB%AC%B8%EC%A0%9C)
 
 #### Redis 직렬화 문제 [WIKI보기]
 
