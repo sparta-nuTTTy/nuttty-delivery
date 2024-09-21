@@ -127,11 +127,11 @@
 
 #### 기상청 API 호출 시 URL 인코딩 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-%EA%B8%B0%EC%83%81%EC%B2%AD-API-%ED%98%B8%EC%B6%9C-%EC%8B%9C-URL-%EC%9D%B4%EC%A4%91-%EC%9D%B8%EC%BD%94%EB%94%A9-%EB%AC%B8%EC%A0%9C)
 
-#### Jwt기반의 인증인가 보안성(Security 추가 적용) [WIKI보기]
+#### Jwt기반의 인증인가 보안성(Security 추가 적용) [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-Jwt%EA%B8%B0%EB%B0%98-%EC%9D%B8%EC%A6%9D%EC%9D%B8%EA%B0%80-%EB%B0%A9%EC%8B%9D-%F0%9F%91%89-Jwt-&-Security-%EA%B8%B0%EB%B0%98%EC%9D%98-%EC%9D%B8%EC%A6%9D%EC%9D%B8%EA%B0%80-%EB%B0%A9%EC%8B%9D)
 
 #### @PostConstruct로 인한 순환참조 문제 [WIKI보기]
 
-#### jackson 라이브러리와 FeginClient 사용 시 문제 [WIKI보기]
+#### jackson 라이브러리와 FeignClient 사용 시 문제 [WIKI보기]
 
 #### Redis 페이지 검색 조건 키 설정 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-Redis-%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B2%80%EC%83%89-%EC%A1%B0%EA%B1%B4-%ED%82%A4-%EC%84%A4%EC%A0%95-%EB%AC%B8%EC%A0%9C)
 
