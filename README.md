@@ -130,7 +130,7 @@
 
 #### Jwt기반의 인증인가 보안성(Security 추가 적용) [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-Jwt%EA%B8%B0%EB%B0%98-%EC%9D%B8%EC%A6%9D%EC%9D%B8%EA%B0%80-%EB%B0%A9%EC%8B%9D-%F0%9F%91%89-Jwt-&-Security-%EA%B8%B0%EB%B0%98%EC%9D%98-%EC%9D%B8%EC%A6%9D%EC%9D%B8%EA%B0%80-%EB%B0%A9%EC%8B%9D)
 
-#### @PostConstruct로 인한 순환참조 문제 [WIKI보기]
+#### @PostConstruct에서 @Transactional 처리 시 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-@PostConstruct%EC%97%90%EC%84%9C-@Transactional-%EC%B2%98%EB%A6%AC-%EC%8B%9C-%EB%AC%B8%EC%A0%9C%EC%A0%90)
 
 #### jackson 라이브러리와 FeignClient 사용 시 문제 [WIKI보기]
 
