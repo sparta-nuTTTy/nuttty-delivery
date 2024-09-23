@@ -1,7 +1,7 @@
 package com.nuttty.eureka.order.application.security;
 
-import com.nuttty.eureka.order.application.fegin.AuthClient;
-import com.nuttty.eureka.order.application.fegin.dto.UserDto;
+import com.nuttty.eureka.order.application.feign.AuthClient;
+import com.nuttty.eureka.order.application.feign.dto.UserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

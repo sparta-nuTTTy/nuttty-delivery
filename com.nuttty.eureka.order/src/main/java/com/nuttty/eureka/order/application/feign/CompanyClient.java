@@ -1,7 +1,7 @@
-package com.nuttty.eureka.order.application.fegin;
+package com.nuttty.eureka.order.application.feign;
 
-import com.nuttty.eureka.order.application.fegin.dto.CompanyInfoDto;
-import com.nuttty.eureka.order.application.fegin.dto.ProductInfoDto;
+import com.nuttty.eureka.order.application.feign.dto.CompanyInfoDto;
+import com.nuttty.eureka.order.application.feign.dto.ProductInfoDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 

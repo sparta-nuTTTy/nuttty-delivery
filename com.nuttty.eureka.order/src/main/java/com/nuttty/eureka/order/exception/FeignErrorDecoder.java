@@ -6,10 +6,10 @@ import feign.codec.ErrorDecoder;
 import org.springframework.http.HttpStatus;
 
 /**
- * FeginErrorDecoder
- * Fegin 에러 처리
+ * FeignErrorDecoder
+ * Feign 에러 처리
  */
-public class FeginErrorDecoder implements ErrorDecoder {
+public class FeignErrorDecoder implements ErrorDecoder {
     private final ErrorDecoder defaultErrorDecoder = new Default();
 
     @Override

@@ -1,7 +1,7 @@
 package com.nuttty.eureka.order.infrastructure.repository;
 
-import com.nuttty.eureka.order.application.fegin.CompanyClient;
-import com.nuttty.eureka.order.application.fegin.dto.CompanyInfoDto;
+import com.nuttty.eureka.order.application.feign.CompanyClient;
+import com.nuttty.eureka.order.application.feign.dto.CompanyInfoDto;
 import com.nuttty.eureka.order.domain.model.*;
 import com.nuttty.eureka.order.domain.repository.OrderRepositoryCustom;
 import com.nuttty.eureka.order.presentation.dto.DeliveryDto;

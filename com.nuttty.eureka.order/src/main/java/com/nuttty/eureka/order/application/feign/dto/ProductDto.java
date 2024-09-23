@@ -1,4 +1,4 @@
-package com.nuttty.eureka.order.application.fegin.dto;
+package com.nuttty.eureka.order.application.feign.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;

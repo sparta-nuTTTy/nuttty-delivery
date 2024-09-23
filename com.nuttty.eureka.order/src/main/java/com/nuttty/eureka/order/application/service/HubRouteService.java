@@ -1,10 +1,10 @@
 package com.nuttty.eureka.order.application.service;
 
-import com.nuttty.eureka.order.application.fegin.HubClient;
-import com.nuttty.eureka.order.application.fegin.dto.ContentDto;
-import com.nuttty.eureka.order.application.fegin.dto.DirectionsResponse;
-import com.nuttty.eureka.order.application.fegin.dto.HubDto;
-import com.nuttty.eureka.order.application.fegin.dto.WayPoint;
+import com.nuttty.eureka.order.application.feign.HubClient;
+import com.nuttty.eureka.order.application.feign.dto.ContentDto;
+import com.nuttty.eureka.order.application.feign.dto.DirectionsResponse;
+import com.nuttty.eureka.order.application.feign.dto.HubDto;
+import com.nuttty.eureka.order.application.feign.dto.WayPoint;
 import com.nuttty.eureka.order.domain.model.HubRoute;
 import com.nuttty.eureka.order.infrastructure.repository.HubRouteRepository;
 import io.github.resilience4j.retry.annotation.Retry;

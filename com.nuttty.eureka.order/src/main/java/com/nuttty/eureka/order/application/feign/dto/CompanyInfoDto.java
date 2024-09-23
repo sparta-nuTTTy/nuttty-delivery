@@ -1,4 +1,4 @@
-package com.nuttty.eureka.order.application.fegin.dto;
+package com.nuttty.eureka.order.application.feign.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProductInfoDto {
+public class CompanyInfoDto {
     private Integer statusCode;
     private String resultMessage;
-    @JsonProperty("productDto")
-    private ProductDto productDto;
+    @JsonProperty("companyDto")
+    private CompanyDataDto data;
 }

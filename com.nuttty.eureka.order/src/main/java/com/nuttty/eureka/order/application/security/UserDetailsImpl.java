@@ -1,7 +1,7 @@
 package com.nuttty.eureka.order.application.security;
 
-import com.nuttty.eureka.order.application.fegin.dto.UserDto;
-import com.nuttty.eureka.order.application.fegin.dto.UserRoleEnum;
+import com.nuttty.eureka.order.application.feign.dto.UserDto;
+import com.nuttty.eureka.order.application.feign.dto.UserRoleEnum;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

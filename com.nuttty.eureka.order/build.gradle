@@ -61,7 +61,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	// Fegin Client(Patch method support)
+	// Feign Client(Patch method support)
 	implementation 'io.github.openfeign:feign-hc5'
 
 	// Springdoc OpenAPI

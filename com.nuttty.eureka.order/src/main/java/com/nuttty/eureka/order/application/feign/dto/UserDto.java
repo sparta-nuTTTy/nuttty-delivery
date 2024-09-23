@@ -1,4 +1,4 @@
-package com.nuttty.eureka.order.application.fegin.dto;
+package com.nuttty.eureka.order.application.feign.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

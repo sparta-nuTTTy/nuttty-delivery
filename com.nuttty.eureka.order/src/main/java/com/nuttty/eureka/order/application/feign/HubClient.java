@@ -1,6 +1,6 @@
-package com.nuttty.eureka.order.application.fegin;
+package com.nuttty.eureka.order.application.feign;
 
-import com.nuttty.eureka.order.application.fegin.dto.HubResponse;
+import com.nuttty.eureka.order.application.feign.dto.HubResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

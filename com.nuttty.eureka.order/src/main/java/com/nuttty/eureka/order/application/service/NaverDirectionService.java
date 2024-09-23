@@ -1,7 +1,7 @@
 package com.nuttty.eureka.order.application.service;
 
-import com.nuttty.eureka.order.application.fegin.dto.DirectionsResponse;
-import com.nuttty.eureka.order.application.fegin.dto.WayPoint;
+import com.nuttty.eureka.order.application.feign.dto.DirectionsResponse;
+import com.nuttty.eureka.order.application.feign.dto.WayPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
