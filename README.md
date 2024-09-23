@@ -132,7 +132,7 @@
 
 #### @PostConstruct에서 @Transactional 처리 시 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-@PostConstruct%EC%97%90%EC%84%9C-@Transactional-%EC%B2%98%EB%A6%AC-%EC%8B%9C-%EB%AC%B8%EC%A0%9C%EC%A0%90)
 
-#### jackson 라이브러리와 FeignClient 사용 시 문제 [WIKI보기]
+#### Jackson라이브러리 snake_case, camelCase 변환 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-Jackson%EB%9D%BC%EC%9D%B4%EB%B8%8C%EB%9F%AC%EB%A6%AC-snake_case,-camelCase-%EB%B3%80%ED%99%98-%EB%AC%B8%EC%A0%9C)
 
 #### Redis 페이지 검색 조건 키 설정 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-Redis-%ED%8E%98%EC%9D%B4%EC%A7%80-%EA%B2%80%EC%83%89-%EC%A1%B0%EA%B1%B4-%ED%82%A4-%EC%84%A4%EC%A0%95-%EB%AC%B8%EC%A0%9C)
 
