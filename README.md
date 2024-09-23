@@ -121,7 +121,7 @@
 
 ## 🚨 Trouble Shooting
 
-#### Feign Client로 PATCH method 사용 불가 문제 [WIKI보기]
+#### Feign Client로 PATCH method 사용 불가 문제 [WIKI보기] (https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-Feign-Client%EB%A1%9C-PATCH-method-%EC%82%AC%EC%9A%A9-%EB%B6%88%EA%B0%80-%EB%AC%B8%EC%A0%9C#%EB%AC%B8%EC%A0%9C-%EC%A0%95%EC%9D%98)
 
 #### 소프트 딜리트로 인해 유티크 제약 설정 문제 [WIKI보기](https://github.com/sparta-nuTTTy/nuttty-delivery/wiki/%5BTrouble-Shooting%5D-%EC%86%8C%ED%94%84%ED%8A%B8-%EB%94%9C%EB%A6%AC%ED%8A%B8%EB%A1%9C-%EC%9D%B8%ED%95%B4-%EC%9C%A0%EB%8B%88%ED%81%AC-%EC%A0%9C%EC%95%BD-%EC%84%A4%EC%A0%95-%EB%AC%B8%EC%A0%9C)
 
