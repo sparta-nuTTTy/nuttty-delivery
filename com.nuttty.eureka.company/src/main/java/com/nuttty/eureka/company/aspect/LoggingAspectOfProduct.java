@@ -22,6 +22,10 @@ public class LoggingAspectOfProduct {
     public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getSignature().getDeclaringTypeName();
+        Object[] methodArgs = joinPoint.getArgs();
+
+        // Debug 로그로 메서드 인자 값 기록
+        log.debug("메서드 호출 - 클래스명: {}, 메서드명: {}, 인자: {}", className, methodName, methodArgs);
 
         long startTime = System.currentTimeMillis();
         log.info("메서드 실행 시작 - 클래스명: {}, 메서드명: {}", className, methodName);
@@ -36,6 +40,9 @@ public class LoggingAspectOfProduct {
 
         long elapsedTime = System.currentTimeMillis() - startTime;
         log.info("메서드 실행 종료 - 클래스명: {}, 메서드명: {}, 실행 시간: {}ms", className, methodName, elapsedTime);
+
+        // Debug 로그로 메서드 결과 값 기록
+        log.debug("메서드 결과 - 클래스명: {}, 메서드명: {}, 반환값: {}", className, methodName, result);
 
         return result;
     }
