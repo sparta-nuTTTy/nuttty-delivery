@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 @NoArgsConstructor
-public class HubDto {
+public class HubDto implements Serializable {
     @JsonProperty("hub_id")
     private UUID hubId;
     @JsonProperty("user_id")
