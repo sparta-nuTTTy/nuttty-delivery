@@ -73,8 +73,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         // 배송 정보 조회 쿼리
         List<Order> orders = queryFactory
                 .selectFrom(order)
-                .join(order.delivery, delivery)
-                .leftJoin(delivery.deliveryRoutes, deliveryRoute)
+                .join(order.delivery, delivery).fetchJoin() // Order와 Delivery OneToOne 관계
                 .where(
                         deliveryIdEq(condition.getDeliveryId()),
                         orderIdEq(condition.getOrderId()),
@@ -91,7 +90,7 @@ public class OrderRepositoryImpl implements OrderRepositoryCustom {
         // 카운트 쿼리 지연 로딩
         JPAQuery<Order> count = queryFactory
                 .selectFrom(order)
-                .join(order.delivery, delivery)
+                .leftJoin(order.delivery, delivery)
                 .where(
                         deliveryIdEq(condition.getDeliveryId()),
                         orderIdEq(condition.getOrderId()),
