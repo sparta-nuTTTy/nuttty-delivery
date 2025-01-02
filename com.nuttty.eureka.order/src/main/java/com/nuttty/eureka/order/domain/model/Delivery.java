@@ -2,6 +2,7 @@ package com.nuttty.eureka.order.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class Delivery extends AuditEntity {
 
     // Delivery와 DlieveryRuote 연관관계
     @OneToMany(mappedBy = "delivery", cascade = CascadeType.ALL, orphanRemoval = true)
+    @BatchSize(size = 100)
     @Builder.Default
     private List<DeliveryRoute> deliveryRoutes = new ArrayList<>();
 

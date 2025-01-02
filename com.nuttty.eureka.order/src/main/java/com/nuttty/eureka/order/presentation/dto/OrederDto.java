@@ -79,6 +79,7 @@ public interface OrederDto {
             this.orderTotalPrice = orderTotalPrice;
             this.receiverId = receiverId;
             this.receiverName = receiverName;
+            this.supplierName = supplierName;
             this.supplierId = supplierId;
             this.deliveryId = deliveryId;
             this.deliveryAddress = deliveryAddress;

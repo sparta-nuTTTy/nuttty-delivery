@@ -17,14 +17,15 @@ spring:
     url: jdbc:postgresql://localhost:5432/orders
     username: delivery
     password: delivery777
+logging:
+  level:
+    com.p6spy: DEBUG
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
-        show_sql: true
-        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_batch_fetch_size: 1000
 
@@ -65,13 +66,14 @@ naver:
     client-id: ${DIRECTION_CLIENT_ID}
     client-secret: ${DIRECTION_CLIENT_SECRET}
 
-# resillience4j
+# resilience4j
 resilience4j:
   retry:
     instances:
-      createHubRoute:
-        maxAttempts: 3       # 최대 재시도 횟수
-        waitDuration: 2s     # 각 재시도 사이의 대기 시간
-        retryExceptions:
-          - java.net.SocketTimeoutException # 재시도를 수행할 예외 타입
-          - java.io.IOException
+      hubService:
+        max-attempts: 3   # 재시도 횟수
+        wait-duration: 500ms  # 재시도 대기 시간
+        enable-exponential-backoff: true  # 지수 백오프 활성화
+        exponential-backoff-multiplier: 2 # 백오프 배수(500ms, 1000ms, 2000ms)
+        max-wait-duration: 5000ms  # 최대 대기 시간 5초
+
